@@ -19,8 +19,8 @@ type RootLayoutProps = {
 
 export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-background text-foreground antialiased`}>
+    <html lang="en" className="dark">
+      <body className={`${inter.className} antialiased min-h-screen`}>
         {children}
       </body>
     </html>
