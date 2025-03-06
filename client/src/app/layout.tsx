@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import DashboardWrapper from "@/app/dashboardWrapper";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,7 +22,7 @@ export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} antialiased min-h-screen`}>
-        {children}
+        <DashboardWrapper>{children}</DashboardWrapper>
       </body>
     </html>
   );
