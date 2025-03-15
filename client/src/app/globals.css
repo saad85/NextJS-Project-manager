@@ -14,117 +14,49 @@ body,
 .app {
   height: 100%;
   width: 100%;
-  font-size: 0.875rem;
-  background-color: white;
-}
-
-.dark html,
-.dark body,
-.dark #root,
-.dark .app {
-  background-color: #121212;
+  @apply text-sm;
+  @apply bg-white;
+  @apply dark:bg-black;
 }
 
 /* TIMELINE STYLING */
 .timeline ._3_ygE {
-  border-top-left-radius: 0.375rem;
-  border: 1px solid #e6e4e4;
-  border-right: 0;
+  @apply rounded-tl-md border border-r-0 border-[#e6e4e4] dark:border-stroke-dark;
 }
-
-.dark .timeline ._3_ygE {
-  border-color: #404040;
-}
-
 .timeline ._2eZzQ {
-  border-color: #e6e4e4;
+  @apply border-[#e6e4e4] dark:border-stroke-dark;
 }
-
-.dark .timeline ._2eZzQ {
-  border-color: #404040;
-}
-
 .timeline ._2dZTy {
-  fill: white;
+  @apply fill-white dark:fill-dark-secondary;
 }
-
-.dark .timeline ._2dZTy {
-  fill: #1E1E1E;
-}
-
 .timeline ._2dZTy:nth-child(even) {
-  fill: #f5f5f5;
+  @apply fill-[#f5f5f5] dark:fill-dark-tertiary;
 }
-
-.dark .timeline ._2dZTy:nth-child(even) {
-  fill: #2D2D2D;
-}
-
 .timeline ._35nLX {
-  fill: white;
-  stroke: #e6e4e4;
+  @apply fill-white stroke-[#e6e4e4] dark:fill-dark-secondary dark:stroke-stroke-dark;
 }
-
-.dark .timeline ._35nLX {
-  fill: #1E1E1E;
-  stroke: #404040;
-}
-
 .timeline ._9w8d5 {
-  fill: #333;
+  @apply fill-[#333] dark:fill-white;
 }
-
-.dark .timeline ._9w8d5 {
-  fill: white;
-}
-
 .timeline ._34SS0 {
-  background-color: white;
+  @apply bg-white dark:bg-dark-secondary;
 }
-
-.dark .timeline ._34SS0 {
-  background-color: #1E1E1E;
-}
-
 .timeline ._34SS0:nth-of-type(even) {
-  background-color: #f5f5f5;
+  @apply bg-[#f5f5f5] dark:bg-dark-tertiary;
 }
-
-.dark .timeline ._34SS0:nth-of-type(even) {
-  background-color: #2D2D2D;
-}
-
 .timeline ._RuwuK,
 .timeline ._3rUKi,
 .timeline ._1rLuZ {
-  stroke: #e6e4e4;
+  @apply stroke-[#e6e4e4] dark:stroke-stroke-dark;
 }
-
-.dark .timeline ._RuwuK,
-.dark .timeline ._3rUKi,
-.dark .timeline ._1rLuZ {
-  stroke: #404040;
-}
-
 .timeline ._3ZbQT {
-  border-left: 0;
-  border-color: #e6e4e4;
+  @apply border-l-0 border-[#e6e4e4] dark:border-stroke-dark;
 }
-
-.dark .timeline ._3ZbQT {
-  border-color: #404040;
-}
-
 .timeline ._3T42e {
-  background-color: white;
+  @apply bg-white dark:bg-dark-bg;
 }
-
-.dark .timeline ._3T42e {
-  background-color: #121212;
-}
-
-.dark .timeline ._29NTg {
-  color: #737373;
+.timeline ._29NTg {
+  @apply dark:text-neutral-500;
 }
 
 ::-webkit-scrollbar {
