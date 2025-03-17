@@ -15,12 +15,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
-// Routes
+/* ROUTES */
+app.get("/", (req, res) => {
+  res.send("This is home route");
+});
 
-// Error handling
-// app.use((err, req, res, next) => {
-//   console.error(err.stack);
-//   res.status(500).send("Something broke!");
-// });
+const port = Number(process.env.PORT) || 3000;
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server running on part ${port}`);
+});
 
 export default app;
