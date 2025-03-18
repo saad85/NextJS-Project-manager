@@ -11,12 +11,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   useEffect(() => {
+    console.log("isDarkMode dashboardWrapper: ", isDarkMode);
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [isDarkMode]);
+  });
 
   return (
     <div className="flex min-h-screen w-full bg-gray-50 text-gray-900">
@@ -27,7 +28,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         }`}
       >
         <Navbar />
-        {children}
+        {children}{" "}
       </main>
     </div>
   );

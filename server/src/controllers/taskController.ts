@@ -10,6 +10,12 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
       where: {
         projectId: Number(projectId),
       },
+      include: {
+        author: true,
+        assignee: true,
+        comments: true,
+        attachments: true,
+      },
     });
     res.status(200).json(tasks);
   } catch (error) {
