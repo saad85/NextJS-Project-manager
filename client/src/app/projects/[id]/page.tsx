@@ -7,6 +7,7 @@ import List from "../List";
 import Timeline from "../Timeline";
 import { useGetProjectByIdQuery } from "@/state/api";
 import Table from "../Table";
+import ModalNewTask from "@/components/ModalNewTask";
 
 type Props = {
   params: {
@@ -22,6 +23,11 @@ const Project = ({ params }: Props) => {
   const { data: project } = useGetProjectByIdQuery({ id: Number(id) });
   return (
     <div>
+      <ModalNewTask
+        isOpen={isModalNewTaskOpen}
+        onClose={() => setIsModalNewTaskOpen(false)}
+        id={id}
+      />
       <ProjectHeader
         activeTab={activeTab}
         setActiveTab={setActiveTab}
