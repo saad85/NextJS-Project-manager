@@ -58,7 +58,7 @@ const Table = ({ id, setIsModalNewTaskOpen }: TableProps) => {
           name="Table"
           buttonComponent={
             <button
-              className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+              className="flex items-center rounded bg-blue-primary px-3 py-2 text-white bg-blue-600"
               onClick={() => setIsModalNewTaskOpen(true)}
             >
               Add Task

@@ -8,9 +8,7 @@ export const getProjects = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log("Fetching projects...");
     const projects = await prisma.project.findMany();
-    console.log("Fetched projects: ", projects);
     res.status(200).json(projects);
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });

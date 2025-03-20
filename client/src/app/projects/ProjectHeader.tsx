@@ -31,7 +31,7 @@ const ProjectHeader = ({ activeTab, name, setActiveTab }: Props) => {
           name={name || ""}
           buttonComponent={
             <button
-              className="flex items-center rounded-md bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+              className="flex items-center rounded-md bg-blue-primary px-3 py-2 text-white bg-blue-600"
               onClick={() => setIsModalNewProjectOpen(true)}
             >
               <PlusSquare className="mr-2 h-5 w-5" /> New Boards

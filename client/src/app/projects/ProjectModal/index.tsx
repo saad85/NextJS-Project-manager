@@ -73,7 +73,7 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
         </div>
         <button
           type="submit"
-          className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${
+          className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${
             !isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
           }`}
           disabled={!isFormValid() || isLoading}
