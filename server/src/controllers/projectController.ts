@@ -17,6 +17,23 @@ export const getProjects = async (
   }
 };
 
+export const getProjectById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const project = await prisma.project.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+    res.status(200).json(project);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const createProject = async (
   req: Request,
   res: Response
