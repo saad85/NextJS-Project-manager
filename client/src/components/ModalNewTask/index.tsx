@@ -10,7 +10,6 @@ type Props = {
 };
 
 const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
-  console.log("project id ", id);
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

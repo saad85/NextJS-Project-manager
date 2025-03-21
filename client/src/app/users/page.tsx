@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import Header from "@/components/Header";
 import { dataGridClassNames, dataGridSxStyles } from "@/utils/lib";
+import { Loader2 } from "lucide-react";
 
 const columns: GridColDef[] = [
   {
@@ -56,9 +57,12 @@ const User = () => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const { data: users, isLoading, error } = useGetUsersQuery();
 
-  console.log(users);
-
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-100 w-100 animate-spin text-black-500" />
+      </div>
+    );
   if (error) return <div>Error fetching users</div>;
 
   return (

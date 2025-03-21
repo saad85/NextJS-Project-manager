@@ -19,7 +19,6 @@ const Board = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
     isLoading,
     error,
   } = useGetTasksQuery({ projectId: Number(id) });
-  console.log("tasks", tasks);
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
   const moveTask = (taskId: number, toStatus: string) => {

@@ -19,7 +19,6 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
 
   const [createProject, { isLoading }] = useCreateProjectMutation();
   const handleSubmit = () => {
-    console.log(projectName, description, startDate, endDate);
     if (!projectName || !startDate || !endDate) return;
 
     const formattedStartDate = formatISO(new Date(startDate));

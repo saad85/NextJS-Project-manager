@@ -14,11 +14,13 @@ type TimelineProps = {
 type TaskTypeItems = "task" | "milestone" | "project";
 
 const Timeline = ({ id, setIsModalNewTaskOpen }: TimelineProps) => {
+  console.log("TIMELINE PAGE PREPARING");
   const {
     data: tasks,
     error,
     isLoading,
   } = useGetTasksQuery({ projectId: Number(id) });
+  console.log("TASKS LOADED");
 
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
@@ -42,7 +44,7 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: TimelineProps) => {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>An error occurred while fetching tasks.</div>;
-
+  console.log("TASKS LOADED");
   return (
     <div className="px-4 xl:px-6">
       <div className="flex flex-wrap items-center justify-between gap-2 py-5">
