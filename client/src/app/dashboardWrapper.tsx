@@ -2,8 +2,8 @@
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import StoreProvider, { useAppDispatch, useAppSelector } from "@/app/redux";
-import { useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./redux";
 import { setLoading } from "@/state/loadingSlice";
@@ -21,8 +21,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     (state: RootState) => state.loading.isLoading
   );
 
-  console.log(isLoading, "isloading q");
-
   useEffect(() => {
     dispatch(setLoading(false)); // Stop loading when page updates
   }, [pathname, dispatch]);
@@ -34,8 +32,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       document.documentElement.classList.remove("dark");
     }
   });
-
-  console.log(isLoading, "isloading");
 
   return (
     <div className="flex min-h-screen w-full bg-gray-50 text-gray-900">
