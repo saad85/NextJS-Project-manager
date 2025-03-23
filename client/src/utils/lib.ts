@@ -30,3 +30,18 @@ export const dataGridSxStyles = (isDarkMode: boolean) => {
     },
   };
 };
+
+export const getTaskStatus = (status: string | undefined) => {
+  switch (status) {
+    case "ToDo":
+      return "To Do";
+    case "WorkInProgress":
+      return "Work In Progress";
+    case "UnderReview":
+      return "Under Review";
+    case "Completed":
+      return "Completed";
+    default:
+      return "Unknown";
+  }
+};

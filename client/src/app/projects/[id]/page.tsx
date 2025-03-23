@@ -8,6 +8,7 @@ import Timeline from "../Timeline";
 import { useGetProjectByIdQuery } from "@/state/api";
 import Table from "../Table";
 import ModalNewTask from "@/components/ModalNewTask";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   params: {
@@ -20,7 +21,20 @@ const Project = ({ params }: Props) => {
   const [activeTab, setActiveTab] = useState("Board");
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
-  const { data: project } = useGetProjectByIdQuery({ id: Number(id) });
+  const { data: project, isLoading } = useGetProjectByIdQuery({
+<<<<<<< HEAD
+    id: id,
+=======
+    id: Number(id),
+>>>>>>> 3d04d232cd4890ac617b97b18b5a32c0cc13eff8
+  });
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+      </div>
+    );
+  }
   return (
     <div>
       <ModalNewTask

@@ -9,8 +9,6 @@ const Navbar = () => {
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed
   );
-  console.log("isDarkMode", isDarkMode);
-  console.log("isSidebarCollapsed", isSidebarCollapsed);
   return (
     <div className="flex items-center justify-between bg-white px-4 py-3 dark:bg-black dark:px-4 dark:py-3">
       <div className="flex items-center gap-8">

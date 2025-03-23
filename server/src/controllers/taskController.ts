@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 
 export const getTasks = async (req: Request, res: Response): Promise<void> => {
   try {
-    const projectId = req.query.projectId;
+    const projectId = req.query.projectId as string;
     const tasks = await prisma.task.findMany({
       where: {
-        projectId: Number(projectId),
+        projectId: projectId,
       },
       include: {
         author: true,
@@ -40,6 +40,7 @@ export const createTask = async (
       projectId,
       authorUserId,
       assignedUserId,
+      attachmentUrl,
     } = req.body;
     const task = await prisma.task.create({
       data: {
@@ -56,6 +57,15 @@ export const createTask = async (
         assignedUserId,
       },
     });
+    if (attachmentUrl) {
+      await prisma.attachment.create({
+        data: {
+          fileURL: attachmentUrl,
+          taskId: task.id,
+          uploadedById: authorUserId,
+        },
+      });
+    }
     res.status(201).json(task);
   } catch (error: any) {
     res
@@ -73,7 +83,7 @@ export const updateTaskStatus = async (
     const { status } = req.body;
     const task = await prisma.task.update({
       where: {
-        id: Number(taskId),
+        id: taskId,
       },
       data: {
         status,
@@ -92,7 +102,7 @@ export const updateTask = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { id } = req.query;
+    const { id } = req.query as { id: string };
     const {
       title,
       description,
@@ -108,7 +118,7 @@ export const updateTask = async (
     } = req.body;
     const task = await prisma.task.update({
       where: {
-        id: Number(id),
+        id: id,
       },
       data: {
         title,
@@ -129,5 +139,35 @@ export const updateTask = async (
     res
       .status(500)
       .json({ message: `Error updating a task: ${error.message}` });
+  }
+};
+
+export const getUserTasks = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const tasks = await prisma.task.findMany({
+      where: {
+<<<<<<< HEAD
+        OR: [{ authorUserId: userId }, { assignedUserId: userId }],
+=======
+        OR: [
+          { authorUserId: Number(userId) },
+          { assignedUserId: Number(userId) },
+        ],
+>>>>>>> 3d04d232cd4890ac617b97b18b5a32c0cc13eff8
+      },
+      include: {
+        author: true,
+        assignee: true,
+      },
+    });
+    res.status(200).json(tasks);
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: `Error getting user tasks: ${error.message}` });
   }
 };

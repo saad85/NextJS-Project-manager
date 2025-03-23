@@ -10,8 +10,11 @@ import React, { useMemo, useState } from "react";
 type TaskTypeItems = "task" | "milestone" | "project";
 
 const Timeline = () => {
+  console.log("TIMELINE PAGE PREPARING");
+
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const { data: projects, isLoading, isError } = useGetProjectsQuery();
+  console.log("PROJECTS LOADED");
 
   const [displayOptions, setDisplayOptions] = useState<DisplayOption>({
     viewMode: ViewMode.Month,
@@ -31,6 +34,7 @@ const Timeline = () => {
       })) || []
     );
   }, [projects]);
+  console.log("TASKS LOADED");
 
   const handleViewModeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -45,6 +49,7 @@ const Timeline = () => {
   if (isError || !projects)
     return <div>An error occurred while fetching projects</div>;
 
+  console.log("TASKS LOADED 2");
   return (
     <div className="max-w-full p-8">
       <header className="mb-4 flex items-center justify-between">
@@ -67,14 +72,14 @@ const Timeline = () => {
           <Gantt
             tasks={ganttTasks}
             {...displayOptions}
-            columnWidth={displayOptions.viewMode === ViewMode.Month ? 180 : 130} // Increase width
-            listCellWidth="160px" // Make columns wider
+            columnWidth={displayOptions.viewMode === ViewMode.Month ? 100 : 80} // Increase width
+            listCellWidth="100px" // Make columns wider
             rowHeight={40} // Increase row height for better readability
-            fontSize="14px" // Slightly increase font size
+            fontSize="12px" // Slightly increase font size
             barCornerRadius={4} // Smooth bar edges for a better UI
-            projectBackgroundColor={isDarkMode ? "#36598C" : "#1E40AF"}
-            projectProgressColor={isDarkMode ? "#36598C" : "#1E40AF"}
-            projectProgressSelectedColor={isDarkMode ? "#36598C" : "#1E40AF"}
+            projectBackgroundColor={isDarkMode ? "#36598C" : "#7F00FF"}
+            projectProgressColor={isDarkMode ? "#36598C" : "#7F00FF"}
+            projectProgressSelectedColor={isDarkMode ? "#36598C" : "#7F00FF"}
           />
         </div>
       </div>

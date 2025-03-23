@@ -24,6 +24,21 @@ const getPriorityColor = (priority: string | undefined) => {
   }
 };
 
+const getTaskStatus = (status: string | undefined) => {
+  switch (status) {
+    case "ToDo":
+      return "To Do";
+    case "WorkInProgress":
+      return "Work In Progress";
+    case "UnderReview":
+      return "Under Review";
+    case "Completed":
+      return "Completed";
+    default:
+      return "Unknown";
+  }
+};
+
 const TaskCard = ({ task }: TaskCardProps) => {
   return (
     <div className="rounded-lg bg-white p-6 shadow-md hover:shadow-lg transition dark:bg-dark-secondary dark:text-white">
@@ -64,7 +79,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
         <p>
           <strong>Status:</strong>{" "}
           <span className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-800">
-            {task.status}
+            {getTaskStatus(task.status)}
           </span>
         </p>
         <p>

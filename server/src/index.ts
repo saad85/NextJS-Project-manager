@@ -7,7 +7,7 @@ import morgan from "morgan";
 import projectRoutes from "./routes/projectRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import userRoutes from "./routes/userRoutes";
-import teamRoutes from "./routes/teamROutes";
+import teamRoutes from "./routes/teamRoutes";
 
 dotenv.config();
 const app = express();

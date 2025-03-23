@@ -8,6 +8,7 @@ import {
   Provider,
 } from "react-redux";
 import globalReducer from "@/state";
+import loadingReducer from "@/state/loadingSlice";
 import { api } from "@/state/api";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
@@ -50,6 +51,7 @@ const persistConfig = {
   whitelist: ["global"],
 };
 const rootReducer = combineReducers({
+  loading: loadingReducer,
   global: globalReducer,
   [api.reducerPath]: api.reducer,
 });

@@ -1,16 +1,12 @@
 "use client";
 import { useGetTeamsQuery } from "@/state/api";
 import React from "react";
-import { useAppSelector } from "../redux";
-import Header from "@/components/Header";
 import {
-  DataGrid,
   GridColDef,
   GridToolbarContainer,
   GridToolbarExport,
   GridToolbarFilterButton,
 } from "@mui/x-data-grid";
-import { dataGridClassNames, dataGridSxStyles } from "@/utils/lib";
 
 const CustomToolbar = () => (
   <GridToolbarContainer className="toolbar flex gap-2">
@@ -32,8 +28,10 @@ const columns: GridColDef[] = [
 
 const Teams = () => {
   const { data: teams, isLoading, isError } = useGetTeamsQuery();
+<<<<<<< HEAD
+=======
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
-  console.log(teams);
+>>>>>>> 3d04d232cd4890ac617b97b18b5a32c0cc13eff8
   if (isLoading) return <div>Loading...</div>;
   if (isError || !teams) return <div>Error fetching teams</div>;
 

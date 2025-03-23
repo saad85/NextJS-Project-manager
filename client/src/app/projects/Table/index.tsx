@@ -1,7 +1,11 @@
 import { useAppSelector } from "@/app/redux";
 import Header from "@/components/Header";
 import { useGetTasksQuery } from "@/state/api";
-import { dataGridClassNames, dataGridSxStyles } from "@/utils/lib";
+import {
+  dataGridClassNames,
+  dataGridSxStyles,
+  getTaskStatus,
+} from "@/utils/lib";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 type TableProps = {
@@ -18,7 +22,7 @@ const columns: GridColDef[] = [
     width: 130,
     renderCell: (params) => (
       <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">
-        {params.value}
+        {getTaskStatus(params.value)}
       </span>
     ),
   },
@@ -30,23 +34,19 @@ const columns: GridColDef[] = [
     field: "author",
     headerName: "Author",
     width: 150,
-    renderCell: (params) => params.value.author || "Unknown",
+    renderCell: (params) => params?.value?.username || "Unknown",
   },
   {
     field: "assignee",
     headerName: "Assignee",
     width: 150,
-    renderCell: (params) => params.value.assignee || "Unassigned",
+    renderCell: (params) => params?.value?.username || "Unassigned",
   },
 ];
 
 const Table = ({ id, setIsModalNewTaskOpen }: TableProps) => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
-  const {
-    data: tasks,
-    isLoading,
-    error,
-  } = useGetTasksQuery({ projectId: Number(id) });
+  const { data: tasks, isLoading, error } = useGetTasksQuery({ projectId: id });
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>An error occurred while fetching tasks</div>;

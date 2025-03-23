@@ -13,21 +13,28 @@ export const getTeams = async (req: Request, res: Response): Promise<void> => {
 
     const formattedTeams = await Promise.all(
       teams.map(async (team) => {
-        const productOwner = await prisma.user.findUnique({
-          where: { userId: team.productOwnerUserId! },
-          select: { username: true },
-        });
-
-        const projectManager = await prisma.user.findUnique({
-          where: { userId: team.projectManagerUserId! },
-          select: { username: true },
-        });
-
-        return {
+        const result = {
           ...team,
-          productOwnerUsername: productOwner?.username,
-          projectManagerUsername: projectManager?.username,
+          productOwnerUsername: "",
+          projectManagerUsername: "",
         };
+        if (team.productOwnerUserId) {
+          const productOwner = await prisma.user.findUnique({
+            where: { userId: team.productOwnerUserId! },
+            select: { username: true },
+          });
+          result.productOwnerUsername = productOwner?.username!;
+        }
+
+        if (team.projectManagerUserId) {
+          const projectManager = await prisma.user.findUnique({
+            where: { userId: team.projectManagerUserId! },
+            select: { username: true },
+          });
+          result.projectManagerUsername = projectManager?.username!;
+        }
+
+        return result;
       })
     );
     res.status(200).json(formattedTeams);

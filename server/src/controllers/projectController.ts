@@ -23,7 +23,7 @@ export const getProjectById = async (
     const { id } = req.params;
     const project = await prisma.project.findUnique({
       where: {
-        id: Number(id),
+        id: id,
       },
     });
     res.status(200).json(project);

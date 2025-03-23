@@ -24,7 +24,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { dataGridClassNames, dataGridSxStyles } from "@/utils/lib";
+import {
+  dataGridClassNames,
+  dataGridSxStyles,
+  getTaskStatus,
+} from "@/utils/lib";
 
 const taskColumns: GridColDef[] = [
   { field: "title", headerName: "Title", width: 200 },
@@ -36,13 +40,18 @@ const taskColumns: GridColDef[] = [
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const HomePage = () => {
+  const { data: projects, isLoading: isProjectsLoading } =
+    useGetProjectsQuery();
   const {
     data: tasks,
     isLoading: tasksLoading,
     isError: tasksError,
-  } = useGetTasksQuery({ projectId: parseInt("1") });
-  const { data: projects, isLoading: isProjectsLoading } =
-    useGetProjectsQuery();
+  } = useGetTasksQuery({ projectId: projects?.[0]?.id || "" });
+
+  const filteredTasks = tasks?.map((task) => ({
+    ...task,
+    status: getTaskStatus(task.status),
+  }));
 
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
@@ -143,7 +152,7 @@ const HomePage = () => {
           </h3>
           <div style={{ height: 400, width: "100%" }}>
             <DataGrid
-              rows={tasks}
+              rows={filteredTasks}
               columns={taskColumns}
               checkboxSelection
               loading={tasksLoading}

@@ -1,7 +1,14 @@
 import Modal from "@/components/Modal";
-import { Priority, Status, useCreateTaskMutation } from "@/state/api";
-import React, { useState } from "react";
+import {
+  Priority,
+  Status,
+  useCreateTaskMutation,
+  useGetUsersQuery,
+  User,
+} from "@/state/api";
+import React, { useEffect, useState } from "react";
 import { formatISO } from "date-fns";
+import s3 from "@/utils/AWS/aws-config"; // Import the AWS S3 configuration
 
 type Props = {
   isOpen: boolean;
@@ -10,7 +17,6 @@ type Props = {
 };
 
 const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
-  console.log("project id ", id);
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -22,6 +28,11 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
   const [authorUserId, setAuthorUserId] = useState("");
   const [assignedUserId, setAssignedUserId] = useState("");
   const [projectId, setProjectId] = useState("");
+  const [file, setFile] = useState<File | null>(null); // State for file upload
+  const [fileUploading, setFileUploading] = useState(false); // State for file upload loading
+
+  // Fetch users using the hook directly
+  const { data: users = [], isLoading: usersLoading } = useGetUsersQuery();
 
   const handleSubmit = async () => {
     if (!title || !authorUserId || !(id !== null || projectId)) return;
@@ -33,6 +44,29 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
       representation: "complete",
     });
 
+    let fileUrl = "";
+
+    // Upload file to AWS S3 if a file is selected
+    if (file) {
+      setFileUploading(true);
+      try {
+        const params = {
+          Bucket: process.env.NEXT_PUBLIC_AWS_BUCKET_NAME!,
+          Key: `uploads/${file.name}`, // Unique file name
+          Body: file,
+          ContentType: file.type,
+        };
+        const { Location } = await s3.upload(params).promise();
+        if (Location) fileUrl = `uploads/${file.name}`;
+      } catch (error) {
+        console.error("Error uploading file to S3:", error);
+        alert("Failed to upload file. Please try again.");
+        return;
+      } finally {
+        setFileUploading(false);
+      }
+    }
+
     await createTask({
       title,
       description,
@@ -41,9 +75,11 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
       tags,
       startDate: formattedStartDate,
       dueDate: formattedDueDate,
-      authorUserId: parseInt(authorUserId),
-      assignedUserId: parseInt(assignedUserId),
-      projectId: id !== null ? Number(id) : Number(projectId),
+      authorUserId: authorUserId,
+      assignedUserId: assignedUserId || null,
+      projectId: id !== null ? id : projectId,
+      points: 40,
+      attachmentUrl: fileUrl, // Add the file URL to the task data
     });
     onClose();
   };
@@ -57,6 +93,22 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
 
   const inputStyles =
     "w-full rounded border border-gray-300 p-2 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
+
+  useEffect(() => {
+    if (!isOpen) {
+      setTitle("");
+      setDescription("");
+      setStatus(Status.ToDo);
+      setPriority(Priority.Backlog);
+      setTags("");
+      setStartDate("");
+      setDueDate("");
+      setAuthorUserId("");
+      setAssignedUserId("");
+      setProjectId("");
+      setFile(null); // Reset file on modal close
+    }
+  }, [isOpen]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} name="Create New Task">
@@ -131,20 +183,40 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
             onChange={(e) => setDueDate(e.target.value)}
           />
         </div>
-        <input
-          type="text"
-          className={inputStyles}
-          placeholder="Author User ID"
+        <select
+          className={selectStyles}
           value={authorUserId}
           onChange={(e) => setAuthorUserId(e.target.value)}
-        />
-        <input
-          type="text"
-          className={inputStyles}
-          placeholder="Assigned User ID"
+        >
+          <option value="">Select Author</option>
+          {usersLoading ? (
+            <option disabled>Loading...</option>
+          ) : (
+            users.map((user) => (
+              <option key={user.userId} value={user.userId}>
+                {user.username}
+              </option>
+            ))
+          )}
+        </select>
+
+        <select
+          className={selectStyles}
           value={assignedUserId}
           onChange={(e) => setAssignedUserId(e.target.value)}
-        />
+        >
+          <option value="">Select Assigned User</option>
+          {usersLoading ? (
+            <option disabled>Loading...</option>
+          ) : (
+            users.map((user) => (
+              <option key={user.userId} value={user.userId}>
+                {user.username}
+              </option>
+            ))
+          )}
+        </select>
+
         {id === null && (
           <input
             type="text"
@@ -154,14 +226,34 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
             onChange={(e) => setProjectId(e.target.value)}
           />
         )}
+
+        {/* File Upload Field */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Upload Image
+          </label>
+          <input
+            type="file"
+            className={inputStyles}
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                setFile(e.target.files[0]);
+              }
+            }}
+          />
+        </div>
+
         <button
           type="submit"
           className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${
-            !isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
+            !isFormValid() || isLoading || fileUploading
+              ? "cursor-not-allowed opacity-50"
+              : ""
           }`}
-          disabled={!isFormValid() || isLoading}
+          disabled={!isFormValid() || isLoading || fileUploading}
         >
-          {isLoading ? "Creating..." : "Create Task"}
+          {isLoading || fileUploading ? "Creating..." : "Create Task"}
         </button>
       </form>
     </Modal>

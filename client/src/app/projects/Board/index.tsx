@@ -5,6 +5,7 @@ import { Task as TaskType } from "@/state/api";
 import { EllipsisVertical, MessageSquareMore, Plus } from "lucide-react";
 import { format } from "date-fns";
 import Image from "next/image";
+import { getSignedUrl } from "@/utils/AWS";
 
 type BoardProps = {
   id: string;
@@ -14,16 +15,19 @@ type BoardProps = {
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Completed"];
 
 const Board = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
+<<<<<<< HEAD
+  const { data: tasks, isLoading, error } = useGetTasksQuery({ projectId: id });
+=======
   const {
     data: tasks,
     isLoading,
     error,
   } = useGetTasksQuery({ projectId: Number(id) });
-  console.log("tasks", tasks);
+>>>>>>> 3d04d232cd4890ac617b97b18b5a32c0cc13eff8
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
-  const moveTask = (taskId: number, toStatus: string) => {
-    updateTaskStatus({ taskId, status: toStatus });
+  const moveTask = (taskId: string, toStatus: string) => {
+    updateTaskStatus({ taskId, status: toStatus.split(" ").join("") });
   };
   return (
     <DndProvider backend={HTML5Backend}>
@@ -45,7 +49,7 @@ const Board = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
 type TaskColumnProps = {
   status: string;
   tasks: TaskType[];
-  moveTask: (taskId: number, toStatus: string) => void;
+  moveTask: (taskId: string, toStatus: string) => void;
   setIsModalNewTaskOpen: (value: boolean) => void;
 };
 
@@ -57,7 +61,7 @@ const TaskColumn = ({
 }: TaskColumnProps) => {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "task",
-    drop: (item: { id: number }) => {
+    drop: (item: { id: string }) => {
       return moveTask(item.id, status);
     },
     collect: (monitor) => ({
@@ -65,7 +69,9 @@ const TaskColumn = ({
     }),
   }));
 
-  const tasksCount = tasks?.filter((task) => task.status === status)?.length;
+  const tasksCount = tasks?.filter(
+    (task) => task.status === status.split(" ").join("")
+  )?.length;
 
   const statusColor: any = {
     "To Do": "#2563EB",
@@ -111,7 +117,7 @@ const TaskColumn = ({
       </div>
 
       {tasks
-        .filter((task) => task.status === status)
+        .filter((task) => task.status === status.split(" ").join(""))
         .map((task) => (
           <Task key={task.id} task={task} />
         ))}
@@ -180,7 +186,7 @@ const Task = ({ task }: TaskProps) => {
     >
       {task.attachments && task.attachments.length > 0 && (
         <Image
-          src={`/${task.attachments[0].fileURL}`}
+          src={getSignedUrl(task.attachments[0].fileURL)}
           alt={task.attachments[0].fileName}
           width={400}
           height={200}

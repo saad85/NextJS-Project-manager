@@ -1,8 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { get } from "http";
 
 export interface Project {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   startDate?: string;
@@ -18,9 +17,9 @@ export enum Priority {
 }
 
 export enum Status {
-  ToDo = "To Do",
-  WorkInProgress = "Work In Progress",
-  UnderReview = "Under Review",
+  ToDo = "ToDo",
+  WorkInProgress = "WorkInProgress",
+  UnderReview = "UnderReview",
   Completed = "Completed",
 }
 
@@ -37,12 +36,12 @@ export interface Attachment {
   id: number;
   fileURL: string;
   fileName: string;
-  taskId: number;
+  taskId: string;
   uploadedById: number;
 }
 
 export interface Task {
-  id: number;
+  id: string;
   title: string;
   description?: string;
   status?: Status;
@@ -51,9 +50,10 @@ export interface Task {
   startDate?: string;
   dueDate?: string;
   points?: number;
-  projectId: number;
-  authorUserId?: number;
-  assignedUserId?: number;
+  projectId: string;
+  authorUserId?: string;
+  assignedUserId?: string | null;
+  attachmentUrl?: string;
 
   author?: User;
   assignee?: User;
@@ -62,10 +62,10 @@ export interface Task {
 }
 
 export interface Team {
-  id: number;
+  id: string;
   teamName: string;
-  productOwnerUserId?: number;
-  projectManagerUserId?: number;
+  productOwnerUserId?: string;
+  projectManagerUserId?: string;
   productOwnerUsername?: string;
   projectManagerUsername?: string;
 }
@@ -81,7 +81,7 @@ export const api = createApi({
       query: () => "projects",
       providesTags: ["Projects"],
     }),
-    getProjectById: build.query<Project, { id: number }>({
+    getProjectById: build.query<Project, { id: string }>({
       query: ({ id }) => `projects/${id}`,
       providesTags: ["Projects"],
     }),
@@ -93,7 +93,7 @@ export const api = createApi({
       }),
       invalidatesTags: ["Projects"], // Invalidate the provided tags, and re fetch the query, so dont need to refetch again after post req
     }),
-    getTasks: build.query<Task[], { projectId: number }>({
+    getTasks: build.query<Task[], { projectId: string }>({
       query: ({ projectId }) => `tasks?projectId=${projectId}`,
       providesTags: (result) =>
         result
@@ -108,7 +108,7 @@ export const api = createApi({
       }),
       invalidatesTags: ["Tasks"],
     }),
-    updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
+    updateTaskStatus: build.mutation<Task, { taskId: string; status: string }>({
       query: ({ taskId, status }) => ({
         url: `tasks/${taskId}/status`,
         method: "PATCH",
@@ -124,6 +124,13 @@ export const api = createApi({
       query: () => "users",
       providesTags: ["Users"],
     }),
+    getTasksByUser: build.query<Task[], number>({
+      query: (userId) => `tasks/user/${userId}`,
+      providesTags: (result, error, userId) =>
+        result
+          ? result.map(({ id }) => ({ type: "Tasks", id }))
+          : [{ type: "Tasks", id: userId }],
+    }),
   }),
 });
 
@@ -136,4 +143,5 @@ export const {
   useGetProjectByIdQuery,
   useGetUsersQuery,
   useGetTeamsQuery,
+  useGetTasksByUserQuery,
 } = api;

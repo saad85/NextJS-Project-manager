@@ -3,6 +3,7 @@
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed } from "@/state";
 import { useGetProjectsQuery } from "@/state/api";
+import { setLoading } from "@/state/loadingSlice";
 // import { useGetAuthUserQuery, useGetProjectsQuery } from "@/state/api";
 import { signOut } from "aws-amplify/auth";
 import {
@@ -14,6 +15,7 @@ import {
   ChevronUp,
   Home,
   Layers3,
+  Loader2,
   LockIcon,
   LucideIcon,
   Search,
@@ -25,14 +27,21 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import React, { useState, useTransition } from "react";
 
 const Sidebar = () => {
   const [showProjects, setShowProjects] = useState(true);
   const [showPriority, setShowPriority] = useState(true);
 
-  const { data: projects } = useGetProjectsQuery();
+  const { data: projects, isLoading } = useGetProjectsQuery();
+<<<<<<< HEAD
+=======
+
+  if (isLoading) {
+    console.log("Loading projects...");
+  }
+>>>>>>> 3d04d232cd4890ac617b97b18b5a32c0cc13eff8
 
   const dispatch = useAppDispatch();
 
@@ -201,28 +210,38 @@ interface SidebarLinkProps {
   key?: string | number | undefined;
 }
 
-const SidebarLink = ({ href, icon: Icon, label, key }: SidebarLinkProps) => {
-  const pathname = usePathname();
-  const isActive =
-    pathname === href || (pathname === "/" && href === "/dashboard");
+const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useAppDispatch();
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    dispatch(setLoading(true));
+    setIsLoading(true);
+    startTransition(() => {
+      router.push(href);
+      setIsLoading(false);
+    });
+  };
 
   return (
-    <Link href={href} className="w-full">
+    <div className="w-full cursor-pointer" onClick={handleClick}>
       <div
-        className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 ${
-          isActive ? "bg-gray-100 text-white dark:bg-gray-600" : ""
-        } justify-start px-8 py-3`}
+        className={`relative flex items-center gap-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 px-8 py-3`}
       >
-        {isActive && (
-          <div className="absolute left-0 top-0 h-[100%] w-[5px] bg-blue-200" />
+        {isLoading ? (
+          <Loader2 className="h-6 w-6 animate-spin text-gray-800 dark:text-gray-100" />
+        ) : (
+          <Icon className="h-6 w-6 text-gray-800 dark:text-gray-100" />
         )}
-
-        <Icon className="h-6 w-6 text-gray-800 dark:text-gray-100" />
-        <span className={`font-medium text-gray-800 dark:text-gray-100`}>
+        <span className="font-medium text-gray-800 dark:text-gray-100">
           {label}
         </span>
       </div>
-    </Link>
+    </div>
   );
 };
 

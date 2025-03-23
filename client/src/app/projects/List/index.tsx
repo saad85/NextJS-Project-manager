@@ -10,11 +10,7 @@ type Props = {
 };
 
 const List = ({ id, setIsModalNewTaskOpen }: Props) => {
-  const {
-    data: tasks,
-    isLoading,
-    error,
-  } = useGetTasksQuery({ projectId: Number(id) });
+  const { data: tasks, isLoading, error } = useGetTasksQuery({ projectId: id });
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>An error occurred while fetching tasks</div>;
