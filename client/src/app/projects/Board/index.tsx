@@ -15,15 +15,7 @@ type BoardProps = {
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Completed"];
 
 const Board = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
-<<<<<<< HEAD
   const { data: tasks, isLoading, error } = useGetTasksQuery({ projectId: id });
-=======
-  const {
-    data: tasks,
-    isLoading,
-    error,
-  } = useGetTasksQuery({ projectId: Number(id) });
->>>>>>> 3d04d232cd4890ac617b97b18b5a32c0cc13eff8
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
   const moveTask = (taskId: string, toStatus: string) => {

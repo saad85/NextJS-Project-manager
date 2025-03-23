@@ -14,17 +14,7 @@ type TimelineProps = {
 type TaskTypeItems = "task" | "milestone" | "project";
 
 const Timeline = ({ id, setIsModalNewTaskOpen }: TimelineProps) => {
-<<<<<<< HEAD
   const { data: tasks, error, isLoading } = useGetTasksQuery({ projectId: id });
-=======
-  console.log("TIMELINE PAGE PREPARING");
-  const {
-    data: tasks,
-    error,
-    isLoading,
-  } = useGetTasksQuery({ projectId: Number(id) });
-  console.log("TASKS LOADED");
->>>>>>> 3d04d232cd4890ac617b97b18b5a32c0cc13eff8
 
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 

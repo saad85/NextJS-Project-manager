@@ -35,13 +35,10 @@ const Sidebar = () => {
   const [showPriority, setShowPriority] = useState(true);
 
   const { data: projects, isLoading } = useGetProjectsQuery();
-<<<<<<< HEAD
-=======
 
   if (isLoading) {
     console.log("Loading projects...");
   }
->>>>>>> 3d04d232cd4890ac617b97b18b5a32c0cc13eff8
 
   const dispatch = useAppDispatch();
 
