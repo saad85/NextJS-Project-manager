@@ -22,11 +22,7 @@ const Project = ({ params }: Props) => {
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
   const { data: project, isLoading } = useGetProjectByIdQuery({
-<<<<<<< HEAD
     id: id,
-=======
-    id: Number(id),
->>>>>>> 3d04d232cd4890ac617b97b18b5a32c0cc13eff8
   });
   if (isLoading) {
     return (

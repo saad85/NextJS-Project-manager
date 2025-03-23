@@ -150,14 +150,7 @@ export const getUserTasks = async (
     const { userId } = req.params;
     const tasks = await prisma.task.findMany({
       where: {
-<<<<<<< HEAD
         OR: [{ authorUserId: userId }, { assignedUserId: userId }],
-=======
-        OR: [
-          { authorUserId: Number(userId) },
-          { assignedUserId: Number(userId) },
-        ],
->>>>>>> 3d04d232cd4890ac617b97b18b5a32c0cc13eff8
       },
       include: {
         author: true,
