@@ -38,8 +38,10 @@ model Project {
   description  String?
   startDate    DateTime?
   endDate      DateTime?
+
   tasks        Task[]
   projectTeams ProjectTeam[]
+  attachments  Attachment[]
 }
 
 model ProjectTeam {
@@ -100,11 +102,13 @@ model Attachment {
   id           String @id @default(uuid())
   fileURL      String
   fileName     String?
-  taskId       String
-  uploadedById String
+  taskId       String?
+  uploadedById String?
+  projectId  String?
 
-  task       Task @relation(fields: [taskId], references: [id])
-  uploadedBy User @relation(fields: [uploadedById], references: [userId])
+  task       Task? @relation(fields: [taskId], references: [id])
+  uploadedBy User? @relation(fields: [uploadedById], references: [userId])
+  project    Project? @relation(fields: [projectId], references: [id])
 }
 
 model Comment {

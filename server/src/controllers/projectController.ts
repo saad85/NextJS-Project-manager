@@ -8,8 +8,40 @@ export const getProjects = async (
   res: Response
 ): Promise<void> => {
   try {
-    const projects = await prisma.project.findMany();
-    res.status(200).json(projects);
+    const projects = await prisma.project.findMany({
+      include: {
+        _count: {
+          select: {
+            tasks: true, // Total number of tasks
+          },
+        },
+        tasks: {
+          select: {
+            status: true,
+          },
+        },
+        attachments: true,
+      },
+    });
+
+    // Process the projects to calculate totals
+    const projectsWithTaskCounts = projects.map((project) => {
+      const totalTasks = project._count.tasks;
+      const totalInProgressTasks = project.tasks.filter(
+        (task) => task.status === "WorkInProgress"
+      ).length;
+      const totalCompletedTasks = project.tasks.filter(
+        (task) => task.status === "Completed"
+      ).length;
+
+      return {
+        ...project,
+        totalNumberOfTasks: totalTasks,
+        totalNumberOfInProgressTasks: totalInProgressTasks,
+        totalNumberOfCompletedTasks: totalCompletedTasks,
+      };
+    });
+    res.status(200).json(projectsWithTaskCounts);
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
@@ -37,7 +69,8 @@ export const createProject = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { name, description, startDate, endDate } = req.body;
+    const { name, description, startDate, endDate, imageUrl, imageName } =
+      req.body;
     const project = await prisma.project.create({
       data: {
         name,
@@ -46,7 +79,18 @@ export const createProject = async (
         endDate,
       },
     });
-    res.status(201).json(project);
+    if (project) {
+      if (imageUrl) {
+        await prisma.attachment.create({
+          data: {
+            fileURL: imageUrl,
+            fileName: imageName,
+            projectId: project.id,
+          },
+        });
+      }
+      res.status(201).json(project);
+    }
   } catch (error: any) {
     res
       .status(500)

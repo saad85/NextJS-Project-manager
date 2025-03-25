@@ -121,6 +121,33 @@ type TaskProps = {
   task: TaskType;
 };
 
+type Priority = "Urgent" | "High" | "Medium" | "Low" | "Backlog" | undefined;
+
+const getPriorityClass = (priority: Priority) => {
+  switch (priority) {
+    case "Urgent":
+      return "bg-red-200 text-red-700";
+    case "High":
+      return "bg-yellow-200 text-yellow-700";
+    case "Medium":
+      return "bg-green-200 text-green-700";
+    case "Low":
+      return "bg-blue-200 text-blue-700";
+    case "Backlog":
+      return "bg-gray-100 dark:bg-neutral-950";
+  }
+};
+
+const PriorityTag = ({ priority }: { priority: TaskType["priority"] }) => (
+  <div
+    className={`rounded-full px-2 py-1 text-xs font-semibold ${getPriorityClass(
+      priority
+    )}`}
+  >
+    {priority}
+  </div>
+);
+
 const Task = ({ task }: TaskProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "task",
@@ -138,34 +165,7 @@ const Task = ({ task }: TaskProps) => {
     ? format(new Date(task.dueDate), "P")
     : "";
 
-  type Priority = "Urgent" | "High" | "Medium" | "Low" | "Backlog" | undefined;
-
-  const getPriorityClass = (priority: Priority) => {
-    switch (priority) {
-      case "Urgent":
-        return "bg-red-200 text-red-700";
-      case "High":
-        return "bg-yellow-200 text-yellow-700";
-      case "Medium":
-        return "bg-green-200 text-green-700";
-      case "Low":
-        return "bg-blue-200 text-blue-700";
-      case "Backlog":
-        return "bg-gray-100 dark:bg-neutral-950";
-    }
-  };
-
   const numberOfComments = (task.comments && task.comments.length) || 0;
-
-  const PriorityTag = ({ priority }: { priority: TaskType["priority"] }) => (
-    <div
-      className={`rounded-full px-2 py-1 text-xs font-semibold ${getPriorityClass(
-        priority
-      )}`}
-    >
-      {priority}
-    </div>
-  );
 
   return (
     <div
@@ -178,7 +178,7 @@ const Task = ({ task }: TaskProps) => {
     >
       {task.attachments && task.attachments.length > 0 && (
         <Image
-          src={getSignedUrl(task.attachments[0].fileURL)}
+          src={getSignedUrl(task.attachments[0].fileURL) || "/i1.jpg"}
           alt={task.attachments[0].fileName}
           width={400}
           height={200}

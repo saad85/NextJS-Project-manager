@@ -8,7 +8,8 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-export const getSignedUrl = (key: string) => {
+export const getSignedUrl = (key: string | undefined) => {
+  if (!key) return undefined;
   const params = {
     Bucket: "aimsbay-project-manager",
     Key: key,
@@ -17,9 +18,27 @@ export const getSignedUrl = (key: string) => {
 
   try {
     const url = s3.getSignedUrl("getObject", params);
+    console.log("Generated signed URL:", url);
     return url;
   } catch (error) {
     console.error("Error generating signed URL:", error);
+    throw error;
+  }
+};
+
+export const uploadToS3 = async (file: File, context: string) => {
+  try {
+    const params = {
+      Bucket: "aimsbay-project-manager",
+      Key: `uploads/${context}/${file.name}`,
+      Body: file,
+      ContentType: file.type,
+    };
+
+    const uploadResponse = await s3.upload(params).promise();
+    return uploadResponse.Location;
+  } catch (error) {
+    console.error("Error uploading to S3:", error);
     throw error;
   }
 };

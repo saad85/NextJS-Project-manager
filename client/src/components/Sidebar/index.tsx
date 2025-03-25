@@ -26,11 +26,11 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useState, useTransition } from "react";
 
 const Sidebar = () => {
+  const router = useRouter();
   const [showProjects, setShowProjects] = useState(true);
   const [showPriority, setShowPriority] = useState(true);
 
@@ -111,7 +111,10 @@ const Sidebar = () => {
 
         {/* PROJECTS LINKS */}
         <button
-          onClick={() => setShowProjects((prev) => !prev)}
+          onClick={() => {
+            router.push("/projects");
+            setShowProjects((prev) => !prev);
+          }}
           className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
         >
           <span className="">Projects</span>

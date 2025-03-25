@@ -6,6 +6,12 @@ export interface Project {
   description?: string;
   startDate?: string;
   endDate?: string;
+  totalNumberOfTasks?: number;
+  totalNumberOfInProgressTasks?: number;
+  totalNumberOfCompletedTasks?: number;
+  imageUrl?: string;
+  imageName?: string;
+  attachments?: Attachment[];
 }
 
 export enum Priority {

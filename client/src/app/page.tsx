@@ -1,6 +1,10 @@
-import Image from "next/image";
 import HomePage from "./home/page";
+import { headers } from "next/headers";
 
 export default function Home() {
-  return <HomePage />;
+  const headersList = headers();
+  const host = headersList.get("host") || "";
+  const subdomain = host.split(".")[0];
+
+  return <HomePage subdomain={subdomain} />;
 }
