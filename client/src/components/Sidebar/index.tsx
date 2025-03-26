@@ -103,7 +103,8 @@ const Sidebar = () => {
         <nav className="z-10 w-full">
           <SidebarLink icon={Home} label="Home" href="/" />
           <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
-          <SidebarLink icon={Search} label="Search" href="/search" />
+          {/* <SidebarLink icon={Search} label="Search" href="/search" /> */}
+          <SidebarLink icon={Users} label="Employees" href="/employees" />
           <SidebarLink icon={Settings} label="Settings" href="/settings" />
           <SidebarLink icon={User} label="Users" href="/users" />
           <SidebarLink icon={Users} label="Teams" href="/teams" />

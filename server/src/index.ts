@@ -8,6 +8,7 @@ import projectRoutes from "./routes/projectRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import userRoutes from "./routes/userRoutes";
 import teamRoutes from "./routes/teamRoutes";
+import employeeRoutes from "./routes/employeeRoutes";
 
 dotenv.config();
 const app = express();
@@ -28,6 +29,7 @@ app.use("/projects", projectRoutes);
 app.use("/tasks", taskRoutes);
 app.use("/users", userRoutes);
 app.use("/teams", teamRoutes);
+app.use("/employees", employeeRoutes);
 
 const port = Number(process.env.PORT) || 3000;
 app.listen(port, "0.0.0.0", () => {

@@ -30,6 +30,8 @@ model Team {
   projectManagerUserId String?
   projectTeams         ProjectTeam[]
   user                 User[]
+
+  Employee Employee[]
 }
 
 model Project {
@@ -48,8 +50,8 @@ model ProjectTeam {
   id        String  @id @default(uuid())
   teamId    String
   projectId String
-  team      Team    @relation(fields: [teamId], references: [id])
-  project   Project @relation(fields: [projectId], references: [id])
+  team      Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 enum TaskStatus {
@@ -71,19 +73,19 @@ model Task {
   id             String       @id @default(uuid())
   title          String
   description    String?
-  status         TaskStatus  @default(ToDo)
+  status         TaskStatus   @default(ToDo)
   priority       TaskPriority @default(Backlog)
   tags           String?
   startDate      DateTime?
   dueDate        DateTime?
   points         Int?
-  projectId      String
+  projectId      String 
   authorUserId   String
   assignedUserId String?
 
-  project         Project          @relation(fields: [projectId], references: [id])
-  author          User             @relation("TaskAuthor", fields: [authorUserId], references: [userId])
-  assignee        User?            @relation("TaskAssignee", fields: [assignedUserId], references: [userId])
+  project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author          User             @relation("TaskAuthor", fields: [authorUserId], references: [userId], onDelete: Cascade)
+  assignee        User?            @relation("TaskAssignee", fields: [assignedUserId], references: [userId], onDelete: SetNull)
   taskAssignments TaskAssignment[]
   attachments     Attachment[]
   comments        Comment[]
@@ -95,7 +97,7 @@ model TaskAssignment {
   taskId String
 
   user User @relation(fields: [userId], references: [userId])
-  task Task @relation(fields: [taskId], references: [id])
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
 model Attachment {
@@ -119,4 +121,19 @@ model Comment {
 
   task Task @relation(fields: [taskId], references: [id])
   user User @relation(fields: [userId], references: [userId])
+}
+
+model Employee {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  email String
+  profilePictureUrl String?
+  position String?
+  department String?
+  hireDate DateTime
+  phone String?
+  teamId String?
+
+  team Team? @relation(fields: [teamId], references: [id])
 }

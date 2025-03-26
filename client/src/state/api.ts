@@ -76,12 +76,24 @@ export interface Team {
   projectManagerUsername?: string;
 }
 
+export interface Employee {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  profilePictureUrl?: string;
+  position?: string;
+  department?: string;
+  hireDate?: string;
+  phone?: string;
+}
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL,
   }),
   reducerPath: "api",
-  tagTypes: ["Projects", "Tasks", "Users", "Teams"],
+  tagTypes: ["Employees", "Projects", "Tasks", "Users", "Teams"],
   endpoints: (build) => ({
     getProjects: build.query<Project[], void>({
       query: () => "projects",
@@ -98,6 +110,13 @@ export const api = createApi({
         body: project,
       }),
       invalidatesTags: ["Projects"], // Invalidate the provided tags, and re fetch the query, so dont need to refetch again after post req
+    }),
+    deleteProject: build.mutation<void, { id: string }>({
+      query: ({ id }) => ({
+        url: `projects/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Projects"],
     }),
     getTasks: build.query<Task[], { projectId: string }>({
       query: ({ projectId }) => `tasks?projectId=${projectId}`,
@@ -137,6 +156,18 @@ export const api = createApi({
           ? result.map(({ id }) => ({ type: "Tasks", id }))
           : [{ type: "Tasks", id: userId }],
     }),
+    getEmployees: build.query<Employee[], void>({
+      query: () => "employees",
+      providesTags: ["Employees"],
+    }),
+    createEmployee: build.mutation<Employee, Partial<Employee>>({
+      query: (employee) => ({
+        url: "employees",
+        method: "POST",
+        body: employee,
+      }),
+      invalidatesTags: ["Employees"],
+    }),
   }),
 });
 
@@ -150,4 +181,7 @@ export const {
   useGetUsersQuery,
   useGetTeamsQuery,
   useGetTasksByUserQuery,
+  useGetEmployeesQuery,
+  useCreateEmployeeMutation,
+  useDeleteProjectMutation,
 } = api;
