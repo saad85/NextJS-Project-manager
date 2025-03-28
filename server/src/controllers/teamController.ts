@@ -21,17 +21,17 @@ export const getTeams = async (req: Request, res: Response): Promise<void> => {
         if (team.productOwnerUserId) {
           const productOwner = await prisma.user.findUnique({
             where: { userId: team.productOwnerUserId! },
-            select: { username: true },
+            select: { firstName: true, lastName: true },
           });
-          result.productOwnerUsername = productOwner?.username!;
+          result.productOwnerUsername = `${productOwner?.firstName} ${productOwner?.lastName}`;
         }
 
         if (team.projectManagerUserId) {
           const projectManager = await prisma.user.findUnique({
             where: { userId: team.projectManagerUserId! },
-            select: { username: true },
+            select: { firstName: true, lastName: true },
           });
-          result.projectManagerUsername = projectManager?.username!;
+          result.projectManagerUsername = `${projectManager?.firstName} ${projectManager?.lastName}`;
         }
 
         return result;

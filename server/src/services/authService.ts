@@ -1,8 +1,18 @@
 import { PrismaClient } from "@prisma/client";
+import jwt, { SignOptions } from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const prisma = new PrismaClient();
+
+const JWT_SECRET = (process.env.JWT_SECRET as string) || "supersecretkey";
+const JWT_EXPIRATION = (process.env.JWT_EXPIRATION as string) || "1h";
+
+console.log("JWT_SECRET:", JWT_SECRET);
+console.log("JWT_EXPIRATION:", JWT_EXPIRATION);
 
 // Signup Validation Schema
 const signupSchema = z.object({
@@ -101,4 +111,59 @@ export const signupService = async (data: any) => {
   });
 
   return user;
+};
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+export const loginService = async (data: any) => {
+  const validatedData = loginSchema.parse(data);
+  const { email, password } = validatedData;
+
+  // Find user by email
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: { role: true, organization: true },
+  });
+
+  if (!user) {
+    throw new Error("Invalid credentials");
+  }
+
+  const passwordMatch = await bcrypt.compare(password, user.password);
+  if (!passwordMatch) {
+    throw new Error("Invalid credentials");
+  }
+
+  const secretKey: jwt.Secret = Buffer.from(JWT_SECRET, "utf-8");
+
+  const payload = {
+    userId: user.userId,
+    role: user.role.name,
+    orgId: user.organizationId,
+  };
+
+  const signOptions: SignOptions = {
+    expiresIn: "1h",
+    algorithm: "HS256",
+  };
+
+  const token = jwt.sign(payload, secretKey, signOptions);
+
+  return {
+    token,
+    user: {
+      userId: user.userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role.name,
+      organization: {
+        name: user.organization?.name,
+        subdomain: user.organization?.subdomain,
+      },
+    },
+  };
 };

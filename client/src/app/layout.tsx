@@ -21,19 +21,10 @@ type RootLayoutProps = {
 };
 
 export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
-  const cookieStore = cookies();
-  const authToken = cookieStore.get("auth-token")?.value;
-  const isAuthenticated = !!authToken;
-
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} antialiased min-h-screen`}>
-        {isAuthenticated ? (
-          <DashboardWrapper>{children}</DashboardWrapper>
-        ) : (
-          <DashboardWrapper>{children}</DashboardWrapper>
-          // <LoginPage />
-        )}
+        <DashboardWrapper>{children}</DashboardWrapper>
       </body>
     </html>
   );

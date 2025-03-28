@@ -8,6 +8,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./redux";
 import { setLoading } from "@/state/loadingSlice";
 import { Loader2 } from "lucide-react";
+import { cookies } from "next/headers";
+import LoginPage from "./login/page";
+import { getAuthToken } from "@/utils/auth";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector(
@@ -55,9 +58,31 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    async function checkAuth() {
+      const token = await getAuthToken(); // Get token from server function
+      setIsAuthenticated(!!token);
+    }
+    checkAuth();
+  }, []);
+
+  if (isAuthenticated === null) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+      </div>
+    );
+  }
   return (
     <StoreProvider>
-      <DashboardLayout>{children}</DashboardLayout>
+      {isAuthenticated ? (
+        <DashboardLayout>{children}</DashboardLayout>
+      ) : (
+        // <DashboardWrapper>{children}</DashboardWrapper>
+        <LoginPage />
+      )}
     </StoreProvider>
   );
 };

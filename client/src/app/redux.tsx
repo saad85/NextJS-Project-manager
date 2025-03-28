@@ -9,9 +9,9 @@ import {
 } from "react-redux";
 import globalReducer from "@/state";
 import loadingReducer from "@/state/loadingSlice";
-import authReducer from "@/state/authslice";
 import { api } from "@/state/api";
 import { setupListeners } from "@reduxjs/toolkit/query";
+import authReducer from "@/state/authSlice";
 
 import {
   persistStore,

@@ -14,8 +14,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { useLoginMutation } from "@/state/api";
 import { useRouter } from "next/navigation";
-import { setCredentials } from "@/state/authslice";
 import { useAppDispatch } from "@/app/redux";
+import { setCredentials } from "@/state/authSlice";
 
 interface LoginFormValues {
   email: string;
