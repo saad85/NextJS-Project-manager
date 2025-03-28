@@ -88,6 +88,13 @@ export interface Employee {
   phone?: string;
 }
 
+export interface AuthResponse {
+  userId: number;
+  username: string;
+  email: string;
+  token: string;
+}
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL,
@@ -168,6 +175,27 @@ export const api = createApi({
       }),
       invalidatesTags: ["Employees"],
     }),
+    login: build.mutation<AuthResponse, { email: string; password: string }>({
+      query: ({ email, password }) => ({
+        url: "auth/login",
+        method: "POST",
+        body: { email, password },
+      }),
+      transformResponse: (response: AuthResponse) => response,
+      transformErrorResponse: (error: any) => error.data,
+    }),
+    register: build.mutation<
+      AuthResponse,
+      { name: string; email: string; password: string }
+    >({
+      query: ({ name, email, password }) => ({
+        url: "auth/register",
+        method: "POST",
+        body: { name, email, password },
+      }),
+      transformResponse: (response: AuthResponse) => response,
+      transformErrorResponse: (error: any) => error.data,
+    }),
   }),
 });
 
@@ -184,4 +212,6 @@ export const {
   useGetEmployeesQuery,
   useCreateEmployeeMutation,
   useDeleteProjectMutation,
+  useLoginMutation,
+  useRegisterMutation,
 } = api;

@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["aimsbay-project-manager.s3.us-east-2.amazonaws.com"],
+    domains: [
+      "aimsbay-project-manager.s3.us-east-2.amazonaws.com",
+      "images.pexels.com",
+    ],
     remotePatterns: [
       {
         protocol: "https",

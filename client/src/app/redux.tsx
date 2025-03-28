@@ -9,6 +9,7 @@ import {
 } from "react-redux";
 import globalReducer from "@/state";
 import loadingReducer from "@/state/loadingSlice";
+import authReducer from "@/state/authslice";
 import { api } from "@/state/api";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
@@ -53,6 +54,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   loading: loadingReducer,
   global: globalReducer,
+  auth: authReducer,
   [api.reducerPath]: api.reducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);

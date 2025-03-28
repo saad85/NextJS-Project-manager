@@ -8,20 +8,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  userId            String  @id @default(uuid())
-  cognitoId         String  @unique
-  username          String  @unique
-  profilePictureUrl String?
-  teamId            String?
+// model User {
+//   userId            String  @id @default(uuid())
+//   cognitoId         String  @unique
+//   username          String  @unique
+//   profilePictureUrl String?
+//   teamId            String?
 
-  authoredTasks   Task[]           @relation("TaskAuthor")
-  assignedTasks   Task[]           @relation("TaskAssignee")
-  taskAssignments TaskAssignment[]
-  attachments     Attachment[]
-  comments        Comment[]
-  team            Team?            @relation(fields: [teamId], references: [id])
-}
+//   authoredTasks   Task[]           @relation("TaskAuthor")
+//   assignedTasks   Task[]           @relation("TaskAssignee")
+//   taskAssignments TaskAssignment[]
+//   attachments     Attachment[]
+//   comments        Comment[]
+//   team            Team?            @relation(fields: [teamId], references: [id])
+// }
 
 model Team {
   id                   String        @id @default(uuid())
@@ -136,4 +136,50 @@ model Employee {
   teamId String?
 
   team Team? @relation(fields: [teamId], references: [id])
+}
+
+model User {
+  userId        String        @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String        @unique
+  phone         String        @unique
+  password      String
+  roleId        String
+  role          Role          @relation(fields: [roleId], references: [id])
+  organization  Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
+  createdAt     DateTime      @default(now())
+  teamId        String?
+
+  authoredTasks   Task[]           @relation("TaskAuthor")
+  assignedTasks   Task[]           @relation("TaskAssignee")
+  taskAssignments TaskAssignment[]
+  attachments     Attachment[]
+  comments        Comment[]
+  team            Team?             @relation(fields: [teamId], references: [id])
+}
+
+model Role {
+  id    String  @id @default(uuid())
+  name  String  @unique
+  users User[]
+}
+
+model Organization {
+  id          String               @id @default(uuid())
+  name        String
+  subdomain   String               @unique
+  users       User[]
+  settings    OrganizationSettings?
+  createdAt   DateTime             @default(now())
+}
+
+model OrganizationSettings {
+  id              String        @id @default(uuid())
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  organizationId  String        @unique
+  allowGuests     Boolean       @default(false)
+  timezone        String        @default("UTC")
+  createdAt       DateTime      @default(now())
 }
