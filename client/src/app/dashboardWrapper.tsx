@@ -8,9 +8,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./redux";
 import { setLoading } from "@/state/loadingSlice";
 import { Loader2 } from "lucide-react";
-import { cookies } from "next/headers";
 import LoginPage from "./login/page";
 import { getAuthToken } from "@/utils/auth";
+import Cookies from "js-cookie";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector(
@@ -58,16 +58,15 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
+  console.log("DashboardWrapper");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
+  const token = Cookies.get("auth-token");
+  console.log("Found token:", token);
   useEffect(() => {
-    async function checkAuth() {
-      const token = await getAuthToken(); // Get token from server function
-      setIsAuthenticated(!!token);
-    }
-    checkAuth();
-  }, []);
+    setIsAuthenticated(!!token);
+  }, [token]);
 
+  // Optional: Show a loader while authentication is being checked
   if (isAuthenticated === null) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -75,12 +74,13 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
+  console.log("isAuthenticated:", isAuthenticated);
+
   return (
     <StoreProvider>
       {isAuthenticated ? (
         <DashboardLayout>{children}</DashboardLayout>
       ) : (
-        // <DashboardWrapper>{children}</DashboardWrapper>
         <LoginPage />
       )}
     </StoreProvider>

@@ -2,8 +2,6 @@ import React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { cookies } from "next/headers";
-import LoginPage from "@/app/login/page";
 import DashboardWrapper from "./dashboardWrapper";
 
 const inter = Inter({

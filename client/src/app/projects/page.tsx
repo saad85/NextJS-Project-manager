@@ -24,7 +24,7 @@ import {
   Trash,
 } from "lucide-react";
 import ProjectModal from "./ProjectModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { getSignedUrl } from "@/utils/AWS";
 import {
@@ -34,6 +34,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DeleteModal } from "@/components/DeleteModal";
+import { useAppSelector } from "../redux";
 
 const ProjectsPage = () => {
   const router = useRouter();
@@ -41,6 +42,9 @@ const ProjectsPage = () => {
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const { data: projects, isLoading, refetch } = useGetProjectsQuery();
   const [deleteProject] = useDeleteProjectMutation();
+  const user = useAppSelector((state) => state.auth.user);
+
+  console.log("User in project: ", user);
 
   const handleViewDetails = (projectId: string) => {
     router.push(`/projects/${projectId}`);
@@ -82,7 +86,7 @@ const ProjectsPage = () => {
         description="Are you sure you want to delete this project? All related tasks and data will be permanently removed."
       />
 
-      <div className="flex justify-between items-center mb-6 pb-4 border-b">
+      <div className="flex justify-between items-center mb-6 pb-4">
         <Header
           name="Projects"
           buttonComponent={

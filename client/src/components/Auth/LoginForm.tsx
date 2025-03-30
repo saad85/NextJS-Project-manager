@@ -14,8 +14,10 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { useLoginMutation } from "@/state/api";
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/app/redux";
+import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setCredentials } from "@/state/authSlice";
+import { setAuthToken } from "@/utils/auth";
+import { useEffect } from "react";
 
 interface LoginFormValues {
   email: string;
@@ -41,7 +43,9 @@ export function LoginForm() {
         password: data.password,
       }).unwrap();
 
-      dispatch(setCredentials(userData));
+      console.log("userData after login", userData);
+
+      dispatch(setCredentials({ user: userData.user, token: userData.token }));
 
       toast({
         title: "Login Successful",
@@ -49,7 +53,9 @@ export function LoginForm() {
         variant: "default",
       });
 
-      router.push("/dashboard");
+      await setAuthToken(userData.token);
+
+      router.push("/");
     } catch (err) {
       toast({
         title: "Login Failed",
@@ -74,10 +80,13 @@ export function LoginForm() {
           }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className="text-sm font-medium text-black">
+                Email
+              </FormLabel>
               <FormControl>
                 <Input
                   placeholder="your@email.com"
+                  className="text-black"
                   {...field}
                   disabled={isLoading}
                 />
@@ -98,9 +107,12 @@ export function LoginForm() {
           }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel className="text-sm font-medium text-black">
+                Password
+              </FormLabel>
               <FormControl>
                 <Input
+                  className="text-black"
                   type="password"
                   placeholder="••••••••"
                   {...field}

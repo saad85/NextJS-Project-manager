@@ -33,50 +33,61 @@ const signupSchema = z.object({
 
 export const signupService = async (data: any) => {
   // Validate data
-  const validatedData = signupSchema.parse(data);
-  const {
-    firstName,
-    lastName,
-    email,
-    phone,
-    password,
-    role,
-    organizationName,
-    subdomain,
-  } = validatedData;
-
+  console.log(data);
+  //   const validatedData = signupSchema.parse(data);
+  //   const {
+  //     firstName,
+  //     lastName,
+  //     email,
+  //     phone,
+  //     password,
+  //     role,
+  //     organizationName,
+  //     subdomain,
+  //   } = validatedData;
+  //   console.log("existingUser", validatedData);
   // Check if email or phone already exists
   const existingUser = await prisma.user.findFirst({
-    where: { OR: [{ email }, { phone }] },
+    where: { OR: [{ email: data.email }, { phone: data.phone }] },
   });
+  console.log("existingUser", existingUser);
   if (existingUser) {
     throw new Error("Email or phone already in use");
   }
 
   // Check if subdomain exists
+  console.log("existingOrg", data.subDomain);
   const existingOrg = await prisma.organization.findUnique({
-    where: { subdomain },
+    where: { subdomain: data.subDomain },
   });
+  console.log("existingOrg", existingOrg);
   if (existingOrg) {
     throw new Error("Subdomain is already in use");
   }
 
   // Hash password
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+  console.log("hashedPassword", hashedPassword);
 
   // Find or create the role
-  const roleName = role || "user";
+  const roleName = data.role || "User";
   let userRole = await prisma.role.findUnique({ where: { name: roleName } });
 
+  console.log("userRole", userRole);
+
   if (!userRole) {
-    throw new Error("Role not found");
+    // throw new Error("Role not found");
+    userRole = await prisma.role.create({
+      data: { name: roleName },
+    });
   }
 
+  console.log("userRole", userRole);
   // Create Organization & Settings
   const organization = await prisma.organization.create({
     data: {
-      name: organizationName,
-      subdomain,
+      name: data.organizationName,
+      subdomain: data.subDomain,
       settings: {
         create: {
           allowGuests: false,
@@ -86,16 +97,16 @@ export const signupService = async (data: any) => {
     },
   });
 
+  console.log("organization", organization);
+
   // Create User and Associate with Organization
   const user = await prisma.user.create({
     data: {
-      firstName,
-      lastName,
-      email,
-      phone,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phone: data.phone,
       password: hashedPassword,
-      roleId: userRole.id,
-      organizationId: organization.id,
     },
     select: {
       userId: true,
@@ -103,12 +114,34 @@ export const signupService = async (data: any) => {
       lastName: true,
       email: true,
       phone: true,
-      role: true,
-      organization: {
-        select: { name: true, subdomain: true },
-      },
     },
   });
+
+  // Create User Role
+  const createdUserRole = await prisma.userRole.create({
+    data: {
+      userId: user.userId,
+      roleId: userRole.id,
+    },
+  });
+
+  console.log("createdUserRole", createdUserRole);
+
+  // Create Organization User
+  const createdOrganizationUser = await prisma.organizationUser.create({
+    data: {
+      userId: user.userId,
+      organizationId: organization.id,
+    },
+    select: {
+      userId: true,
+      organizationId: true,
+    },
+  });
+
+  console.log("createdOrganizationUser", createdOrganizationUser);
+
+  console.log("user", user);
 
   return user;
 };
@@ -119,20 +152,27 @@ const loginSchema = z.object({
 });
 
 export const loginService = async (data: any) => {
-  const validatedData = loginSchema.parse(data);
-  const { email, password } = validatedData;
+  //   const validatedData = loginSchema.parse(data);
+  //   const { email, password } = validatedData;
 
   // Find user by email
   const user = await prisma.user.findUnique({
-    where: { email },
-    include: { role: true, organization: true },
+    where: { email: data.email },
+    include: {
+      organizationUsers: {
+        include: {
+          organization: true, // ✅ Include organization data
+        },
+      },
+      userRoles: true,
+    },
   });
 
   if (!user) {
     throw new Error("Invalid credentials");
   }
 
-  const passwordMatch = await bcrypt.compare(password, user.password);
+  const passwordMatch = await bcrypt.compare(data.password, user.password);
   if (!passwordMatch) {
     throw new Error("Invalid credentials");
   }
@@ -141,8 +181,8 @@ export const loginService = async (data: any) => {
 
   const payload = {
     userId: user.userId,
-    role: user.role.name,
-    orgId: user.organizationId,
+    roleId: user.userRoles[0].roleId,
+    orgId: user.organizationUsers[0].organizationId,
   };
 
   const signOptions: SignOptions = {
@@ -159,10 +199,9 @@ export const loginService = async (data: any) => {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      role: user.role.name,
       organization: {
-        name: user.organization?.name,
-        subdomain: user.organization?.subdomain,
+        name: user.organizationUsers[0].organization.name,
+        subdomain: user.organizationUsers[0].organization.subdomain,
       },
     },
   };

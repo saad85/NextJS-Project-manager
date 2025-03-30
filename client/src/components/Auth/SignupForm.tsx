@@ -1,4 +1,3 @@
-// components/auth/signup-form.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -19,10 +18,13 @@ import { useAppDispatch } from "@/app/redux";
 import { setCredentials } from "@/state/authSlice";
 
 interface SignupFormValues {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  subDomain: string;
   password: string;
   confirmPassword: string;
+  organizationName: string;
 }
 
 export function SignupForm() {
@@ -32,10 +34,13 @@ export function SignupForm() {
 
   const form = useForm<SignupFormValues>({
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
+      subDomain: "",
+      organizationName: "",
     },
   });
 
@@ -49,13 +54,17 @@ export function SignupForm() {
     }
 
     try {
+      console.log(data);
       const userData = await register({
-        name: data.name,
+        firstName: data.firstName,
+        lastName: data.lastName,
         email: data.email,
         password: data.password,
+        subDomain: data.subDomain,
+        organizationName: data.organizationName,
       }).unwrap();
 
-      dispatch(setCredentials(userData));
+      dispatch(setCredentials({ user: userData.user, token: userData.token }));
 
       toast({
         title: "Registration Successful",
@@ -73,7 +82,6 @@ export function SignupForm() {
         variant: "destructive",
       });
 
-      // Handle specific field errors if available in the API response
       if (err.data?.errors) {
         Object.entries(err.data.errors).forEach(([field, message]) => {
           form.setError(field as keyof SignupFormValues, {
@@ -88,22 +96,26 @@ export function SignupForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
+        {/* First Name */}
         <FormField
           control={form.control}
-          name="name"
+          name="firstName"
           rules={{
-            required: "Name is required",
+            required: "First name is required",
             minLength: {
               value: 2,
-              message: "Name must be at least 2 characters",
+              message: "First name must be at least 2 characters",
             },
           }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel className="text-sm font-medium text-black">
+                First Name
+              </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Your name"
+                  className="text-black"
+                  placeholder="Your first name"
                   {...field}
                   disabled={isLoading}
                 />
@@ -112,6 +124,37 @@ export function SignupForm() {
             </FormItem>
           )}
         />
+
+        {/* Last Name */}
+        <FormField
+          control={form.control}
+          name="lastName"
+          rules={{
+            required: "Last name is required",
+            minLength: {
+              value: 2,
+              message: "Last name must be at least 2 characters",
+            },
+          }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-medium text-black">
+                Last Name
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="text-black"
+                  placeholder="Your last name"
+                  {...field}
+                  disabled={isLoading}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Email */}
         <FormField
           control={form.control}
           name="email"
@@ -124,9 +167,12 @@ export function SignupForm() {
           }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className="text-sm font-medium text-black">
+                Email
+              </FormLabel>
               <FormControl>
                 <Input
+                  className="text-black"
                   placeholder="your@email.com"
                   {...field}
                   disabled={isLoading}
@@ -136,6 +182,8 @@ export function SignupForm() {
             </FormItem>
           )}
         />
+
+        {/* Password */}
         <FormField
           control={form.control}
           name="password"
@@ -148,9 +196,12 @@ export function SignupForm() {
           }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel className="text-sm font-medium text-black">
+                Password
+              </FormLabel>
               <FormControl>
                 <Input
+                  className="text-black"
                   type="password"
                   placeholder="••••••••"
                   {...field}
@@ -161,6 +212,8 @@ export function SignupForm() {
             </FormItem>
           )}
         />
+
+        {/* Confirm Password */}
         <FormField
           control={form.control}
           name="confirmPassword"
@@ -169,9 +222,12 @@ export function SignupForm() {
           }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
+              <FormLabel className="text-sm font-medium text-black">
+                Confirm Password
+              </FormLabel>
               <FormControl>
                 <Input
+                  className="text-black"
                   type="password"
                   placeholder="••••••••"
                   {...field}
@@ -182,6 +238,65 @@ export function SignupForm() {
             </FormItem>
           )}
         />
+
+        {/* Sub Domain */}
+        <FormField
+          control={form.control}
+          name="subDomain"
+          rules={{
+            required: "Sub domain is required",
+            minLength: {
+              value: 2,
+              message: "Sub domain must be at least 2 characters",
+            },
+          }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-medium text-black">
+                Sub Domain
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="text-black"
+                  placeholder="Enter a Sub domain"
+                  {...field}
+                  disabled={isLoading}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Organization Name */}
+        <FormField
+          control={form.control}
+          name="organizationName"
+          rules={{
+            required: "Organization name is required",
+            minLength: {
+              value: 3,
+              message: "Organization name must be at least 3 characters",
+            },
+          }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-medium text-black">
+                Organization Name
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="text-black"
+                  placeholder="Enter an Organization name"
+                  {...field}
+                  disabled={isLoading}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Creating account..." : "Sign Up"}
         </Button>

@@ -93,6 +93,7 @@ export interface AuthResponse {
   username: string;
   email: string;
   token: string;
+  user: User;
 }
 
 export const api = createApi({
@@ -186,12 +187,33 @@ export const api = createApi({
     }),
     register: build.mutation<
       AuthResponse,
-      { name: string; email: string; password: string }
+      {
+        firstName: string;
+        lastName: string;
+        email: string;
+        password: string;
+        subDomain: string;
+        organizationName: string;
+      }
     >({
-      query: ({ name, email, password }) => ({
+      query: ({
+        firstName,
+        lastName,
+        email,
+        password,
+        subDomain,
+        organizationName,
+      }) => ({
         url: "auth/register",
         method: "POST",
-        body: { name, email, password },
+        body: {
+          firstName,
+          lastName,
+          email,
+          password,
+          subDomain,
+          organizationName,
+        },
       }),
       transformResponse: (response: AuthResponse) => response,
       transformErrorResponse: (error: any) => error.data,

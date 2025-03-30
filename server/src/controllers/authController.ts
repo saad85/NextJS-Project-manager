@@ -4,6 +4,24 @@ import { loginService, signupService } from "../services/authService";
 
 export const signup = async (req: Request, res: Response) => {
   try {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      subDomain,
+      organizationName,
+    } = req.body;
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !password ||
+      !subDomain ||
+      !organizationName
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
     const user = await signupService(req.body);
     res
       .status(201)

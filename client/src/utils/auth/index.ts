@@ -6,9 +6,11 @@ export async function getAuthToken() {
 }
 
 export async function setAuthToken(token: string) {
-  return cookies().set("auth-token", token);
+  await cookies().set("auth-token", token);
+  return true;
 }
 
 export async function removeAuthToken() {
-  return cookies().delete("auth-token");
+  await cookies().delete("auth-token");
+  return true;
 }
