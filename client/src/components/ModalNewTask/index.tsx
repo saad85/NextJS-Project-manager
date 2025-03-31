@@ -194,7 +194,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
           ) : (
             users.map((user) => (
               <option key={user.userId} value={user.userId}>
-                {user.username}
+                {user.firstName} {user.lastName}
               </option>
             ))
           )}
@@ -211,7 +211,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
           ) : (
             users.map((user) => (
               <option key={user.userId} value={user.userId}>
-                {user.username}
+                {user.firstName} {user.lastName}
               </option>
             ))
           )}

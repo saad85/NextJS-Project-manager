@@ -4,7 +4,6 @@ import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed } from "@/state";
 import { useGetProjectsQuery } from "@/state/api";
 import { setLoading } from "@/state/loadingSlice";
-// import { useGetAuthUserQuery, useGetProjectsQuery } from "@/state/api";
 import { signOut } from "aws-amplify/auth";
 import {
   AlertCircle,
@@ -17,8 +16,8 @@ import {
   Layers3,
   Loader2,
   LockIcon,
+  LogOut,
   LucideIcon,
-  Search,
   Settings,
   ShieldAlert,
   User,
@@ -26,8 +25,14 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { useState, useTransition } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { User as UserType } from "@/state/api";
 
 const Sidebar = () => {
   const router = useRouter();
@@ -35,36 +40,32 @@ const Sidebar = () => {
   const [showPriority, setShowPriority] = useState(true);
 
   const { data: projects, isLoading } = useGetProjectsQuery();
-
-  if (isLoading) {
-    console.log("Loading projects...");
-  }
+  const currentUser = useAppSelector(
+    (state) => state.auth.user
+  ) as UserType | null;
 
   const dispatch = useAppDispatch();
-
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed
   );
 
-  // const { data: currentUser } = useGetAuthUserQuery({});
   const handleSignOut = async () => {
     try {
       await signOut();
+      router.push("/login");
     } catch (error) {
       console.error("Error signing out: ", error);
     }
   };
-  // if (!currentUser) return null;
-  // const currentUserDetails = currentUser?.userDetails;
 
-  const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl
-    transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white
-    ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}
-  `;
+  const sidebarClassNames = `fixed flex flex-col h-full justify-between shadow-xl transition-all duration-300 z-40 dark:bg-black overflow-hidden bg-white ${
+    isSidebarCollapsed ? "w-0 hidden" : "w-64"
+  }`;
 
   return (
     <div className={sidebarClassNames}>
-      <div className="flex h-[100%] w-full flex-col justify-start">
+      {/* Scrollable upper section */}
+      <div className="flex-1 overflow-y-auto">
         {/* TOP LOGO */}
         <div className="z-50 flex min-h-[56px] w-64 items-center justify-between bg-white px-6 pt-3 dark:bg-black">
           <div className="text-xl font-bold text-gray-800 dark:text-white">
@@ -81,6 +82,7 @@ const Sidebar = () => {
             </button>
           )}
         </div>
+
         {/* TEAM */}
         <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
           <Image
@@ -99,11 +101,11 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
+
         {/* NAVBAR LINKS */}
         <nav className="z-10 w-full">
           <SidebarLink icon={Home} label="Home" href="/" />
           <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
-          {/* <SidebarLink icon={Search} label="Search" href="/search" /> */}
           <SidebarLink icon={Users} label="Employees" href="/employees" />
           <SidebarLink icon={Settings} label="Settings" href="/settings" />
           <SidebarLink icon={User} label="Users" href="/users" />
@@ -125,6 +127,7 @@ const Sidebar = () => {
             <ChevronDown className="h-5 w-5" />
           )}
         </button>
+
         {/* PROJECTS LIST */}
         {showProjects &&
           projects?.map((project) => (
@@ -148,6 +151,7 @@ const Sidebar = () => {
             <ChevronDown className="h-5 w-5" />
           )}
         </button>
+
         {showPriority && (
           <>
             <SidebarLink
@@ -174,32 +178,48 @@ const Sidebar = () => {
           </>
         )}
       </div>
-      <div className="z-10 mt-32 flex w-full flex-col items-center gap-4 bg-white px-8 py-4 dark:bg-black md:hidden">
-        <div className="flex w-full items-center">
-          <div className="align-center flex h-9 w-9 justify-center">
-            {/* {!!currentUserDetails?.profilePictureUrl ? (
-              <Image
-                src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${currentUserDetails?.profilePictureUrl}`}
-                alt={currentUserDetails?.username || "User Profile Picture"}
-                width={100}
-                height={50}
-                className="h-full rounded-full object-cover"
-              />
-            ) : (
-              <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
-            )} */}
-          </div>
-          <span className="mx-3 text-gray-800 dark:text-white">
-            {/* {currentUserDetails?.username} */}
-          </span>
-          <button
-            className="self-start rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"
-            onClick={handleSignOut}
-          >
-            Sign out
-          </button>
+
+      {/* Fixed bottom user profile section */}
+      {currentUser && (
+        <div className="border-t border-gray-200 p-4 dark:border-gray-700">
+          <Popover>
+            <PopoverTrigger asChild>
+              <div className="flex cursor-pointer items-center gap-3 rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800">
+                {currentUser.profilePictureUrl ? (
+                  <Image
+                    src={currentUser.profilePictureUrl}
+                    alt={currentUser.firstName}
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                    <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                  </div>
+                )}
+                <div className="flex-1 overflow-hidden">
+                  <p className="truncate font-medium text-gray-800 dark:text-gray-200">
+                    {currentUser.firstName} {currentUser.lastName}
+                  </p>
+                  <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+                    {currentUser.email}
+                  </p>
+                </div>
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="start">
+              <button
+                onClick={handleSignOut}
+                className="flex w-full items-center gap-2 rounded p-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Log out</span>
+              </button>
+            </PopoverContent>
+          </Popover>
         </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -230,9 +250,7 @@ const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
 
   return (
     <div className="w-full cursor-pointer" onClick={handleClick}>
-      <div
-        className={`relative flex items-center gap-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 px-8 py-3`}
-      >
+      <div className="relative flex items-center gap-3 px-8 py-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700">
         {isLoading ? (
           <Loader2 className="h-6 w-6 animate-spin text-gray-800 dark:text-gray-100" />
         ) : (

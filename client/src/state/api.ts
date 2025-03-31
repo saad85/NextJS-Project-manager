@@ -1,3 +1,4 @@
+import { RootState } from "@/app/redux";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface Project {
@@ -31,7 +32,8 @@ export enum Status {
 
 export interface User {
   userId?: number;
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   profilePictureUrl?: string;
   cognitoId?: string;
@@ -99,6 +101,13 @@ export interface AuthResponse {
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL,
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).auth.token;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   reducerPath: "api",
   tagTypes: ["Employees", "Projects", "Tasks", "Users", "Teams"],

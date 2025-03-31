@@ -40,6 +40,7 @@ model Project {
   description  String?
   startDate    DateTime?
   endDate      DateTime?
+  organizationId String
 
   tasks        Task[]
   projectTeams ProjectTeam[]

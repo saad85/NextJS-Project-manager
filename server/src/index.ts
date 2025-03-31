@@ -10,6 +10,7 @@ import userRoutes from "./routes/userRoutes";
 import teamRoutes from "./routes/teamRoutes";
 import employeeRoutes from "./routes/employeeRoutes";
 import authRoutes from "./routes/authRoutes";
+import { authenticateUser } from "./middlewares/authMiddleware";
 
 dotenv.config();
 const app = express();
@@ -26,12 +27,15 @@ app.get("/", (req, res) => {
   res.send("This is home route");
 });
 
+app.use("/auth", authRoutes);
+
+app.use(authenticateUser);
+
 app.use("/projects", projectRoutes);
 app.use("/tasks", taskRoutes);
 app.use("/users", userRoutes);
 app.use("/teams", teamRoutes);
 app.use("/employees", employeeRoutes);
-app.use("/auth", authRoutes);
 
 const port = Number(process.env.PORT) || 3000;
 app.listen(port, "0.0.0.0", () => {
