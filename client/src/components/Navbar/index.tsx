@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from "@/app/redux";
+import { useAppDispatch, useAppSelector } from "@/app/reduxStoreProvider";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
 import { Menu, Moon, Search, Settings, Sun } from "lucide-react";
 import Link from "next/link";

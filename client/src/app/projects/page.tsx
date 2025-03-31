@@ -34,7 +34,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DeleteModal } from "@/components/DeleteModal";
-import { useAppSelector } from "../redux";
+import { useAppSelector } from "../reduxStoreProvider";
 
 const ProjectsPage = () => {
   const router = useRouter();

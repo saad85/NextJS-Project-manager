@@ -67,7 +67,6 @@ export const signupService = async (data: any) => {
 
   // Hash password
   const hashedPassword = await bcrypt.hash(data.password, 10);
-  console.log("hashedPassword", hashedPassword);
 
   // Find or create the role
   const roleName = data.role || "User";
@@ -117,16 +116,6 @@ export const signupService = async (data: any) => {
     },
   });
 
-  // Create User Role
-  const createdUserRole = await prisma.userRole.create({
-    data: {
-      userId: user.userId,
-      roleId: userRole.id,
-    },
-  });
-
-  console.log("createdUserRole", createdUserRole);
-
   // Create Organization User
   const createdOrganizationUser = await prisma.organizationUser.create({
     data: {
@@ -136,10 +125,22 @@ export const signupService = async (data: any) => {
     select: {
       userId: true,
       organizationId: true,
+      id: true,
     },
   });
 
   console.log("createdOrganizationUser", createdOrganizationUser);
+
+  // Create User Role
+  const createdUserRole = await prisma.orgUserRole.create({
+    data: {
+      orgUserId: createdOrganizationUser.id,
+      roleId: userRole.id,
+      orgId: organization.id,
+    },
+  });
+
+  console.log("createdUserRole", createdUserRole);
 
   console.log("user", user);
 
@@ -156,17 +157,25 @@ export const loginService = async (data: any) => {
   //   const { email, password } = validatedData;
 
   // Find user by email
+  console.log("data", data);
   const user = await prisma.user.findUnique({
     where: { email: data.email },
     include: {
       organizationUsers: {
+        where: {
+          organization: {
+            subdomain: data.subDomain,
+          },
+        },
         include: {
-          organization: true, // ✅ Include organization data
+          organization: true,
+          orgUserRoles: true,
         },
       },
-      userRoles: true,
     },
   });
+
+  console.log("user in login", user);
 
   if (!user) {
     throw new Error("Invalid credentials");
@@ -181,7 +190,7 @@ export const loginService = async (data: any) => {
 
   const payload = {
     userId: user.userId,
-    roleId: user.userRoles[0].roleId,
+    roleId: user.organizationUsers[0].orgUserRoles[0].roleId,
     orgId: user.organizationUsers[0].organizationId,
   };
 

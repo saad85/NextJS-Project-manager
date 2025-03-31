@@ -6,7 +6,6 @@ import { SignupForm } from "@/components/Auth/SignupForm";
 import Image from "next/image";
 
 export default function LoginPage() {
-  console.log("LoginPage");
   return (
     <div className="min-h-screen flex">
       {/* Left side - Image */}

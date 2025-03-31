@@ -148,19 +148,21 @@ model OrganizationUser {
 
   user          User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
   organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  orgUserRoles  OrgUserRole[]
 
   @@unique([userId, organizationId]) // Ensures a user can't join the same organization multiple times
 }
 
-model UserRole {
+model OrgUserRole {
   id     String @id @default(uuid())
-  userId String
+  orgUserId String
+  orgId String
   roleId String
 
-  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  orgUser OrganizationUser @relation(fields: [orgUserId], references: [id], onDelete: Cascade)
   role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, roleId]) // Ensures a user can't have the same role multiple times
+  @@unique([orgUserId, roleId]) // Ensures a user can't have the same role multiple times
 }
 
 model User {
@@ -174,7 +176,6 @@ model User {
 
   // Relationships
   organizationUsers OrganizationUser[]
-  userRoles         UserRole[]
   authoredTasks     Task[]           @relation("TaskAuthor")
   assignedTasks     Task[]           @relation("TaskAssignee")
   taskAssignments   TaskAssignment[]
@@ -194,7 +195,7 @@ model Role {
   id    String  @id @default(uuid())
   name  RoleName  @unique @default(Admin)
 
-  userRoles UserRole[]
+  orgUserRoles OrgUserRole[]
 }
 
 model Organization {

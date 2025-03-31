@@ -14,17 +14,35 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { useLoginMutation } from "@/state/api";
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/app/redux";
+import { useAppDispatch, useAppSelector } from "@/app/reduxStoreProvider";
 import { setCredentials } from "@/state/authSlice";
 import { setAuthToken } from "@/utils/auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface LoginFormValues {
   email: string;
   password: string;
 }
 
+const getSubdomain = () => {
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    const parts = hostname.split(".");
+
+    // Assuming a structure like `sub.example.com`
+    if (parts.length > 2) {
+      return parts[0]; // First part is the subdomain
+    }
+  }
+  return null;
+};
+
 export function LoginForm() {
+  const [subdomain, setSubdomain] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSubdomain(getSubdomain());
+  }, []);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [login, { isLoading }] = useLoginMutation();
@@ -37,10 +55,12 @@ export function LoginForm() {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
+    console.log("subdomain", subdomain);
     try {
       const userData = await login({
         email: data.email,
         password: data.password,
+        subDomain: subdomain || null,
       }).unwrap();
 
       console.log("userData after login", userData);

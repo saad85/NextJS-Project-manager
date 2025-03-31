@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { useRegisterMutation } from "@/state/api";
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/app/redux";
+import { useAppDispatch } from "@/app/reduxStoreProvider";
 import { setCredentials } from "@/state/authSlice";
 
 interface SignupFormValues {

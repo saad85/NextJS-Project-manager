@@ -1,4 +1,4 @@
-import { RootState } from "@/app/redux";
+import { RootState } from "@/app/reduxStoreProvider";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface Project {
@@ -185,11 +185,14 @@ export const api = createApi({
       }),
       invalidatesTags: ["Employees"],
     }),
-    login: build.mutation<AuthResponse, { email: string; password: string }>({
-      query: ({ email, password }) => ({
+    login: build.mutation<
+      AuthResponse,
+      { email: string; password: string; subDomain?: string | null }
+    >({
+      query: ({ email, password, subDomain }) => ({
         url: "auth/login",
         method: "POST",
-        body: { email, password },
+        body: { email, password, subDomain },
       }),
       transformResponse: (response: AuthResponse) => response,
       transformErrorResponse: (error: any) => error.data,

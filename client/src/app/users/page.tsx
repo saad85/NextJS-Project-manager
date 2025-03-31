@@ -1,6 +1,6 @@
 "use client";
 import { useGetUsersQuery } from "@/state/api";
-import { useAppSelector } from "@/app/redux";
+import { useAppSelector } from "@/app/reduxStoreProvider";
 import {
   DataGrid,
   GridColDef,

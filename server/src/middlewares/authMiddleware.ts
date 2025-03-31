@@ -41,9 +41,16 @@ export const authenticateUser = async (
     // 3. Find user in database
     const user = await prisma.user.findUnique({
       where: { userId: decoded.userId },
+      include: {
+        organizationUsers: {
+          where: {
+            organizationId: decoded.orgId,
+          },
+        },
+      },
     });
 
-    console.log("User:", user);
+    console.log("User organizationUsers:", user?.organizationUsers);
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -55,18 +62,15 @@ export const authenticateUser = async (
         .json({ error: "Organization ID not found in token" });
     }
 
-    const organization = await prisma.organizationUser.findUnique({
-      where: { id: decoded.orgId, userId: user.userId },
-    });
-
-    console.log("Organization:", organization);
-
-    if (!organization) {
-      return res.status(404).json({ error: "Organization not found" });
-    }
+    // user.organizationId = decoded.orgId;
 
     // 4. Attach user to request object
-    req.user = user;
+    req.user = {
+      orgUserId: user.organizationUsers[0].id,
+      userId: user.userId,
+      roleId: decoded.roleId,
+      orgId: user.organizationUsers[0].organizationId,
+    };
 
     // 5. Proceed to next middleware
     next();

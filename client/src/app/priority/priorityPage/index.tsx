@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAppSelector } from "@/app/redux";
+import { useAppSelector } from "@/app/reduxStoreProvider";
 import { Task, useGetTasksByUserQuery } from "@/state/api";
 import { Priority } from "@/state/api";
 

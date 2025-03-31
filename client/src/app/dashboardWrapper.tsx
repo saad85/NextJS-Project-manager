@@ -1,15 +1,16 @@
 "use client";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import StoreProvider, { useAppDispatch, useAppSelector } from "@/app/redux";
+import StoreProvider, {
+  useAppDispatch,
+  useAppSelector,
+} from "@/app/reduxStoreProvider";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "./redux";
+import { usePathname } from "next/navigation";
+import { RootState } from "./reduxStoreProvider";
 import { setLoading } from "@/state/loadingSlice";
 import { Loader2 } from "lucide-react";
 import LoginPage from "./login/page";
-import { getAuthToken } from "@/utils/auth";
 import Cookies from "js-cookie";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {

@@ -9,6 +9,9 @@ export const getProjects = async (
 ): Promise<void> => {
   try {
     const projects = await prisma.project.findMany({
+      where: {
+        organizationId: req.user.orgId,
+      },
       include: {
         _count: {
           select: {
@@ -56,6 +59,7 @@ export const getProjectById = async (
     const project = await prisma.project.findUnique({
       where: {
         id: id,
+        organizationId: req.user.orgId,
       },
     });
     res.status(200).json(project);
@@ -71,12 +75,14 @@ export const createProject = async (
   try {
     const { name, description, startDate, endDate, imageUrl, imageName } =
       req.body;
+    console.log(req.user);
     const project = await prisma.project.create({
       data: {
         name,
         description,
         startDate,
         endDate,
+        organizationId: req.user.orgId,
       },
     });
     if (project) {
