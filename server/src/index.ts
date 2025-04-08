@@ -11,6 +11,7 @@ import teamRoutes from "./routes/teamRoutes";
 import employeeRoutes from "./routes/employeeRoutes";
 import authRoutes from "./routes/authRoutes";
 import { authenticateUser } from "./middlewares/authMiddleware";
+import orgUserRoutes from "./routes/orgUserRoutes";
 
 dotenv.config();
 const app = express();
@@ -36,6 +37,7 @@ app.use("/tasks", taskRoutes);
 app.use("/users", userRoutes);
 app.use("/teams", teamRoutes);
 app.use("/employees", employeeRoutes);
+app.use("/organization-users", orgUserRoutes);
 
 const port = Number(process.env.PORT) || 3000;
 app.listen(port, "0.0.0.0", () => {

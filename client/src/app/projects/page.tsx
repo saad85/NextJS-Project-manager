@@ -22,6 +22,7 @@ import {
   Plus,
   MoreVertical,
   Trash,
+  Briefcase,
 } from "lucide-react";
 import ProjectModal from "./ProjectModal";
 import { useEffect, useState } from "react";
@@ -130,8 +131,8 @@ const ProjectsPage = () => {
               </DropdownMenu>
             </div>
 
-            <div className="w-full h-32 overflow-hidden rounded-t-lg">
-              {project.attachments && project.attachments.length > 0 && (
+            <div className="w-full h-32 overflow-hidden rounded-t-lg flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+              {project.attachments && project.attachments.length > 0 ? (
                 <Image
                   src={
                     getSignedUrl(project.attachments[0].fileURL) || "/i1.jpg"
@@ -141,6 +142,9 @@ const ProjectsPage = () => {
                   height={200}
                   className="h-auto w-full rounded-t-md object-cover"
                 />
+              ) : (
+                // Fallback: default briefcase icon
+                <Briefcase className="w-12 h-12 text-gray-400" />
               )}
             </div>
 

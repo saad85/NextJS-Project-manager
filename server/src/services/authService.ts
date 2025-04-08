@@ -66,7 +66,7 @@ export const signupService = async (data: any) => {
   }
 
   // Hash password
-  const hashedPassword = await bcrypt.hash(data.password, 10);
+  const hashedPassword = await bcrypt.hash(data.password || "", 10);
 
   // Find or create the role
   const roleName = data.role || "User";
@@ -181,7 +181,10 @@ export const loginService = async (data: any) => {
     throw new Error("Invalid credentials");
   }
 
-  const passwordMatch = await bcrypt.compare(data.password, user.password);
+  const passwordMatch = await bcrypt.compare(
+    data.password,
+    user.password || ""
+  );
   if (!passwordMatch) {
     throw new Error("Invalid credentials");
   }

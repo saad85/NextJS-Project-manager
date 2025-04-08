@@ -38,6 +38,7 @@ export interface User {
   profilePictureUrl?: string;
   cognitoId?: string;
   teamId?: number;
+  phone?: string;
 }
 
 export interface Attachment {
@@ -98,6 +99,27 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface OrgUser {
+  id: number;
+  userId: number;
+  organizationId: number;
+  user: User;
+}
+
+export enum RoleName {
+  Admin = "Admin",
+  Employee = "Employee",
+  User = "User",
+}
+
+export interface OrgUserInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  roles: RoleName[];
+}
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL,
@@ -110,7 +132,7 @@ export const api = createApi({
     },
   }),
   reducerPath: "api",
-  tagTypes: ["Employees", "Projects", "Tasks", "Users", "Teams"],
+  tagTypes: ["Employees", "Projects", "Tasks", "Users", "Teams", "OrgUsers"],
   endpoints: (build) => ({
     getProjects: build.query<Project[], void>({
       query: () => "projects",
@@ -230,6 +252,18 @@ export const api = createApi({
       transformResponse: (response: AuthResponse) => response,
       transformErrorResponse: (error: any) => error.data,
     }),
+    getOrgUsers: build.query<OrgUser[], void>({
+      query: () => "organization-users",
+      providesTags: ["OrgUsers"],
+    }),
+    createOrgUser: build.mutation<OrgUser, OrgUserInput>({
+      query: (orgUser) => ({
+        url: "organization-users",
+        method: "POST",
+        body: orgUser,
+      }),
+      invalidatesTags: ["OrgUsers"],
+    }),
   }),
 });
 
@@ -248,4 +282,6 @@ export const {
   useDeleteProjectMutation,
   useLoginMutation,
   useRegisterMutation,
+  useGetOrgUsersQuery,
+  useCreateOrgUserMutation,
 } = api;
