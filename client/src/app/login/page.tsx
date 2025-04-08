@@ -11,7 +11,7 @@ export default function LoginPage() {
       {/* Left side - Image */}
       <div className="hidden lg:block relative w-1/2">
         <Image
-          src="https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg"
+          src="/pexels-artempodrez-5716001.jpg"
           alt="Authentication"
           fill
           className="object-cover"
