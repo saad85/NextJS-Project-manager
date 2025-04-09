@@ -18,7 +18,6 @@ export const getSignedUrl = (key: string | undefined) => {
 
   try {
     const url = s3.getSignedUrl("getObject", params);
-    console.log("Generated signed URL:", url);
     return url;
   } catch (error) {
     console.error("Error generating signed URL:", error);

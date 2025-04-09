@@ -12,6 +12,7 @@ import { setLoading } from "@/state/loadingSlice";
 import { Loader2 } from "lucide-react";
 import LoginPage from "./login/page";
 import Cookies from "js-cookie";
+import Loading from "@/components/Loading";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector(
@@ -46,13 +47,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         }`}
       >
         <Navbar />
-        {isLoading ? (
-          <div className="flex h-screen items-center justify-center">
-            <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
-          </div>
-        ) : (
-          <>{children}</>
-        )}
+        {isLoading ? <Loading /> : <>{children}</>}
       </main>
     </div>
   );

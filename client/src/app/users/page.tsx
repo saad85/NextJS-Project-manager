@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Mail, User, Users as TeamIcon, Phone } from "lucide-react";
 import Header from "@/components/Header";
 import { NewUserModal } from "@/app/users/NewUserModal";
+import Loading from "@/components/Loading";
 
 const UserCard = ({ user }: { user: any }) => {
   return (
@@ -74,7 +75,7 @@ const UsersPage = () => {
   if (isLoading)
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-gray-500" />
+        <Loading />
       </div>
     );
   if (error)
@@ -91,8 +92,16 @@ const UsersPage = () => {
         {users && users.length > 0 ? (
           users.map((user) => <UserCard key={user.email} user={user} />)
         ) : (
-          <div className="text-center col-span-full text-gray-500">
-            No users found.
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="text-center space-y-4 max-w-md">
+              <div className="relative h-24 w-24 rounded-full overflow-hidden border-4 border-white shadow-md mx-auto bg-gray-200 flex items-center justify-center">
+                <User className="h-12 w-12 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900">No users</h3>
+              <p className="text-sm text-gray-500">
+                Get started by adding a user.
+              </p>
+            </div>
           </div>
         )}
       </div>

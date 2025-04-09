@@ -11,6 +11,7 @@ import ModalNewTask from "@/components/ModalNewTask";
 import Header from "@/components/Header";
 import { dataGridClassNames, dataGridSxStyles } from "@/utils/lib";
 import { Loader2 } from "lucide-react"; // Import ShadCN loader
+import Loading from "@/components/Loading";
 
 type Props = {
   priority: Priority;
@@ -86,11 +87,7 @@ const PriorityPage = ({ priority }: Props) => {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!tasks) return <div>No tasks found</div>;

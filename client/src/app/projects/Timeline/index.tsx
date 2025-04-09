@@ -5,6 +5,7 @@ import { useGetTasksQuery } from "@/state/api";
 import { ViewMode, Gantt, DisplayOption } from "gantt-task-react";
 import { useMemo, useState } from "react";
 import "gantt-task-react/dist/index.css";
+import Loading from "@/components/Loading";
 
 type TimelineProps = {
   id: string;
@@ -36,7 +37,7 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: TimelineProps) => {
     }));
   }, [tasks]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading />;
   if (error) return <div>An error occurred while fetching tasks.</div>;
   return (
     <div className="px-4 xl:px-6">

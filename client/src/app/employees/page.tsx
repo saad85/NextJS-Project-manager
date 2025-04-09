@@ -24,6 +24,7 @@ import EmployeeModal from "./EmployeeModal";
 import { useState } from "react";
 import Header from "@/components/Header";
 import { getSignedUrl } from "@/utils/AWS";
+import Loading from "@/components/Loading";
 
 const EmployeesPage = () => {
   const router = useRouter();
@@ -38,7 +39,7 @@ const EmployeesPage = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

@@ -1,8 +1,8 @@
 "use client";
 
-import { useCreateProjectMutation } from "@/state/api";
+import { useCreateProjectMutation, useLazyGetOrgUsersQuery } from "@/state/api";
 import { formatISO } from "date-fns";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,7 +15,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useDropzone } from "react-dropzone";
-import { UploadCloud, X } from "lucide-react";
+import { Check, UploadCloud, X, User } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 
 type ProjectModalProps = {
   isOpen: boolean;
@@ -28,10 +38,34 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [managerIds, setManagerIds] = useState<string[]>([]);
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
+  const commandRef = useRef<HTMLDivElement>(null);
 
-  const [createProject, { isLoading }] = useCreateProjectMutation();
+  const [createProject, { isLoading: createLoading }] =
+    useCreateProjectMutation();
+  const [
+    getOrgUsers,
+    { data: orgUsers, isLoading: isOrgUsersLoading, error: orgUsersError },
+  ] = useLazyGetOrgUsersQuery();
+
+  // Close the dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        commandRef.current &&
+        !commandRef.current.contains(event.target as Node)
+      ) {
+        setIsCommandOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -39,6 +73,18 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
       setUploadError(null);
     }
   }, []);
+
+  const handleManagerChange = (id: string) => {
+    if (managerIds.includes(id)) {
+      setManagerIds((prev) => prev.filter((managerId) => managerId !== id));
+    } else {
+      setManagerIds((prev) => [...prev, id]);
+    }
+  };
+
+  const removeManager = (id: string) => {
+    setManagerIds((prev) => prev.filter((managerId) => managerId !== id));
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -54,7 +100,6 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
 
   const uploadToS3 = async (file: File) => {
     try {
-      // Get a pre-signed URL from your backend
       const response = await fetch("/api/aws/s3", {
         method: "POST",
         headers: {
@@ -67,7 +112,7 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
       });
 
       const { url, key } = await response.json();
-      // Upload the file to S3 using the pre-signed URL
+      console.log("Pre upload response", url);
       const uploadResponse = await fetch(url, {
         method: "PUT",
         body: file,
@@ -105,6 +150,7 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
         description,
         startDate: formattedStartDate,
         endDate: formattedEndDate,
+        managerIds,
         imageUrl: imageKey,
         imageName: file?.name,
       };
@@ -119,6 +165,21 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
   const isFormValid = () => {
     return projectName && startDate && endDate;
   };
+
+  const handleCommandFocus = () => {
+    console.log("handleCommandFocus");
+    setIsCommandOpen(true);
+    console.log("isCommandOpen", isCommandOpen);
+    console.log("orgUsers", orgUsers);
+    if (!orgUsers) {
+      getOrgUsers();
+      console.log("getOrgUsers", orgUsers);
+    }
+  };
+
+  // Get selected managers data
+  const selectedManagers =
+    orgUsers?.filter((user) => managerIds.includes(user.id)) || [];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -210,15 +271,95 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
             {uploadError && (
               <p className="text-sm text-red-500">{uploadError}</p>
             )}
+            <div ref={commandRef} className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Project Manager
+              </label>
+              <Command>
+                <CommandInput
+                  placeholder="Search managers..."
+                  onFocus={handleCommandFocus}
+                  onClick={() => setIsCommandOpen(true)}
+                />
+                {isCommandOpen && (
+                  <CommandGroup className="absolute z-10 w-full mt-1 border rounded-md shadow-lg bg-popover">
+                    {isOrgUsersLoading ? (
+                      <CommandEmpty>Loading managers...</CommandEmpty>
+                    ) : orgUsersError ? (
+                      <CommandEmpty>Error loading managers</CommandEmpty>
+                    ) : orgUsers?.length === 0 ? (
+                      <CommandEmpty>No managers available</CommandEmpty>
+                    ) : (
+                      <>
+                        <CommandEmpty>No manager found</CommandEmpty>
+                        {orgUsers?.map(({ user, id }) => (
+                          <CommandItem
+                            key={id}
+                            value={`${user.firstName} ${user.lastName}`}
+                            onSelect={() => handleManagerChange(id)}
+                            className="cursor-pointer"
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                managerIds.includes(id)
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {user.firstName} {user.lastName}
+                          </CommandItem>
+                        ))}
+                      </>
+                    )}
+                  </CommandGroup>
+                )}
+              </Command>
+
+              {/* Selected managers chips */}
+              {selectedManagers.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {selectedManagers.map(({ user, id }) => (
+                    <Badge
+                      key={id}
+                      variant="outline"
+                      className="flex items-center gap-2 py-1 px-2 rounded-full"
+                    >
+                      {user.profilePictureUrl ? (
+                        <Image
+                          src={user.profilePictureUrl}
+                          alt={`${user.firstName} ${user.lastName}`}
+                          width={20}
+                          height={20}
+                          className="rounded-full w-5 h-5 object-cover"
+                        />
+                      ) : (
+                        <User className="w-4 h-4 text-gray-500" />
+                      )}
+                      <span>
+                        {user.firstName} {user.lastName}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeManager(id)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <DialogFooter>
             <Button
               type="submit"
-              disabled={!isFormValid() || isLoading}
+              disabled={!isFormValid() || createLoading}
               className="w-full sm:w-auto"
             >
-              {isLoading ? "Creating..." : "Create Project"}
+              {createLoading ? "Creating..." : "Create Project"}
             </Button>
           </DialogFooter>
         </form>

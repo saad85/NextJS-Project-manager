@@ -23,6 +23,7 @@ import {
   MoreVertical,
   Trash,
   Briefcase,
+  User,
 } from "lucide-react";
 import ProjectModal from "./ProjectModal";
 import { useEffect, useState } from "react";
@@ -36,6 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DeleteModal } from "@/components/DeleteModal";
 import { useAppSelector } from "../reduxStoreProvider";
+import Loading from "@/components/Loading";
 
 const ProjectsPage = () => {
   const router = useRouter();
@@ -63,12 +65,14 @@ const ProjectsPage = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (!projects) {
     return <div>No projects found.</div>;
   }
+
+  console.log("projects>> ", projects);
 
   return (
     <div className="p-8">
@@ -141,7 +145,6 @@ const ProjectsPage = () => {
                   className="h-auto w-full rounded-t-md object-cover"
                 />
               ) : (
-                // Fallback: default briefcase icon
                 <Briefcase className="w-12 h-12 text-gray-400" />
               )}
             </div>
@@ -158,7 +161,53 @@ const ProjectsPage = () => {
             </CardHeader>
 
             <CardContent className="p-4">
-              {/* ... rest of your card content ... */}
+              {/* Project Managers */}
+              {project.projectManagers &&
+                project.projectManagers.length > 0 && (
+                  <div className="flex items-center -space-x-2 mb-4">
+                    {project.projectManagers.slice(0, 5).map((manager) => (
+                      <div
+                        key={manager.id}
+                        className="relative inline-block rounded-full border-2 border-white dark:border-gray-800"
+                      >
+                        {manager.orgUser?.user?.profilePictureUrl ? (
+                          <Image
+                            src={
+                              getSignedUrl(
+                                manager.orgUser.user.profilePictureUrl
+                              ) || ""
+                            }
+                            alt={`${manager.orgUser.user.firstName} ${manager.orgUser.user.lastName}`}
+                            width={32}
+                            height={32}
+                            className="rounded-full w-8 h-8 object-cover"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                            <User className="w-4 h-4 text-gray-500" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {project.projectManagers.length > 5 && (
+                      <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium">
+                        +{project.projectManagers.length - 5}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+              {/* Project Dates */}
+              <div className="space-y-2">
+                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {project.startDate &&
+                    formatDate(new Date(project.startDate), "MMM d, yyyy")}
+                  <span className="mx-1">-</span>
+                  {project.endDate &&
+                    formatDate(new Date(project.endDate), "MMM d, yyyy")}
+                </div>
+              </div>
             </CardContent>
 
             <CardFooter className="p-4 flex justify-end">

@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 import ProjectHeader from "../ProjectHeader";
-import Board from "../Board";
-import List from "../List";
-import Timeline from "../Timeline";
 import { useGetProjectByIdQuery } from "@/state/api";
-import Table from "../Table";
 import ModalNewTask from "@/components/ModalNewTask";
-import { Loader2 } from "lucide-react";
+import Loading from "@/components/Loading";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Lazy load the tab components
+const Board = lazy(() => import("../Board"));
+const List = lazy(() => import("../List"));
+const Timeline = lazy(() => import("../Timeline"));
+const Table = lazy(() => import("../Table"));
 
 type Props = {
   params: {
@@ -24,13 +27,42 @@ const Project = ({ params }: Props) => {
   const { data: project, isLoading } = useGetProjectByIdQuery({
     id: id,
   });
+
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
-      </div>
-    );
+    return <Loading />;
   }
+
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case "Board":
+        return (
+          <Suspense fallback={<TabSkeleton />}>
+            <Board id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+          </Suspense>
+        );
+      case "List":
+        return (
+          <Suspense fallback={<TabSkeleton />}>
+            <List id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+          </Suspense>
+        );
+      case "Timeline":
+        return (
+          <Suspense fallback={<TabSkeleton />}>
+            <Timeline id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+          </Suspense>
+        );
+      case "Table":
+        return (
+          <Suspense fallback={<TabSkeleton />}>
+            <Table id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+          </Suspense>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div>
       <ModalNewTask
@@ -43,20 +75,18 @@ const Project = ({ params }: Props) => {
         setActiveTab={setActiveTab}
         name={project?.name}
       />
-      {activeTab === "Board" && (
-        <Board id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
-      )}
-      {activeTab === "List" && (
-        <List id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
-      )}
-      {activeTab === "Timeline" && (
-        <Timeline id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
-      )}
-      {activeTab === "Table" && (
-        <Table id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
-      )}
+      {renderActiveTab()}
     </div>
   );
 };
+
+// Skeleton loader for tabs
+const TabSkeleton = () => (
+  <div className="space-y-4 p-4">
+    <Skeleton className="h-8 w-full" />
+    <Skeleton className="h-8 w-full" />
+    <Skeleton className="h-64 w-full" />
+  </div>
+);
 
 export default Project;

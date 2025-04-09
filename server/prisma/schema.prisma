@@ -45,6 +45,16 @@ model Project {
   tasks        Task[]
   projectTeams ProjectTeam[]
   attachments  Attachment[]
+  projectManagers ProjectManager[]
+}
+
+model ProjectManager {
+  id String @id @default(uuid())
+  orgUserId String 
+  projectId String
+
+  orgUser OrganizationUser @relation(fields: [orgUserId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model ProjectTeam {
@@ -107,7 +117,7 @@ model Attachment {
   fileName     String?
   taskId       String?
   uploadedById String?
-  projectId  String?
+  projectId    String?
 
   task       Task? @relation(fields: [taskId], references: [id])
   uploadedBy User? @relation(fields: [uploadedById], references: [userId])
@@ -149,6 +159,7 @@ model OrganizationUser {
   user          User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
   organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   orgUserRoles  OrgUserRole[]
+  projectManagers ProjectManager[]
 
   @@unique([userId, organizationId]) // Ensures a user can't join the same organization multiple times
 }
@@ -183,6 +194,22 @@ model User {
   comments          Comment[]
   teamId            String?
   team              Team?             @relation(fields: [teamId], references: [id])
+  profile           Profile?
+}
+
+model Profile {
+  id String @id @default(uuid())
+  userId String @unique
+  firstName String
+  lastName String
+  email String
+  profilePictureUrl String?
+  position String?
+  department String?
+  hireDate DateTime
+  phone String?
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
 }
 
 enum RoleName {

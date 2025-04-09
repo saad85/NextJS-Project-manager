@@ -13,6 +13,14 @@ export interface Project {
   imageUrl?: string;
   imageName?: string;
   attachments?: Attachment[];
+  projectManagers?: ProjectManager[];
+}
+
+export interface ProjectManager {
+  id: string;
+  orgUserId: string;
+  projectId: string;
+  orgUser: OrgUser;
 }
 
 export enum Priority {
@@ -103,7 +111,7 @@ export interface AuthResponse {
 }
 
 export interface OrgUser {
-  id: number;
+  id: string;
   userId: number;
   organizationId: number;
   user: User;
@@ -290,4 +298,5 @@ export const {
   useRegisterMutation,
   useGetOrgUsersQuery,
   useCreateOrgUserMutation,
+  useLazyGetOrgUsersQuery,
 } = api;

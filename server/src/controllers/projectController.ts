@@ -24,8 +24,19 @@ export const getProjects = async (
           },
         },
         attachments: true,
+        projectManagers: {
+          include: {
+            orgUser: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
       },
     });
+
+    console.log("projects", projects);
 
     // Process the projects to calculate totals
     const projectsWithTaskCounts = projects.map((project) => {
@@ -73,8 +84,15 @@ export const createProject = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { name, description, startDate, endDate, imageUrl, imageName } =
-      req.body;
+    const {
+      name,
+      description,
+      startDate,
+      endDate,
+      imageUrl,
+      imageName,
+      managerIds = [],
+    } = req.body;
     const project = await prisma.project.create({
       data: {
         name,
@@ -85,6 +103,14 @@ export const createProject = async (
       },
     });
     if (project) {
+      if (managerIds.length > 0) {
+        await prisma.projectManager.createMany({
+          data: managerIds.map((managerId: string) => ({
+            orgUserId: managerId,
+            projectId: project.id,
+          })),
+        });
+      }
       if (imageUrl) {
         await prisma.attachment.create({
           data: {
