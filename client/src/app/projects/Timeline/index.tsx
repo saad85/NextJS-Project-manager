@@ -38,7 +38,6 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: TimelineProps) => {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>An error occurred while fetching tasks.</div>;
-  console.log("TASKS LOADED");
   return (
     <div className="px-4 xl:px-6">
       <div className="flex flex-wrap items-center justify-between gap-2 py-5">

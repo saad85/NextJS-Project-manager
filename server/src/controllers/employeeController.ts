@@ -5,7 +5,27 @@ const prisma = new PrismaClient();
 
 export const getEmployees = async (req: Request, res: Response) => {
   try {
-    const employees = await prisma.employee.findMany();
+    const employees = await prisma.organizationUser.findMany({
+      where: {
+        organizationId: req.user.orgId,
+        orgUserRoles: {
+          some: {
+            role: {
+              name: "Employee",
+            },
+          },
+        },
+      },
+      include: {
+        orgUserRoles: {
+          include: {
+            role: true,
+          },
+        },
+        user: true,
+      },
+    });
+
     res.status(200).json(employees);
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });

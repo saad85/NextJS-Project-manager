@@ -55,15 +55,12 @@ export function LoginForm() {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    console.log("subdomain", subdomain);
     try {
       const userData = await login({
         email: data.email,
         password: data.password,
         subDomain: subdomain || null,
       }).unwrap();
-
-      console.log("userData after login", userData);
 
       dispatch(setCredentials({ user: userData.user, token: userData.token }));
 

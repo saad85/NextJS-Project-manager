@@ -45,8 +45,6 @@ const ProjectsPage = () => {
   const [deleteProject] = useDeleteProjectMutation();
   const user = useAppSelector((state) => state.auth.user);
 
-  console.log("User in project: ", user);
-
   const handleViewDetails = (projectId: string) => {
     router.push(`/projects/${projectId}`);
   };

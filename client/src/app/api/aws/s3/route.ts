@@ -15,15 +15,7 @@ export async function POST(
   { params }: { params: { context: string } }
 ) {
   try {
-    console.log("Starting S3 Pre-Signed URL generation");
     const { filename, filetype } = await request.json();
-
-    console.log("Received filename:", filename);
-    console.log("Received filetype:", filetype);
-    console.log("Bucket name:", process.env.AWS_S3_BUCKET_NAME);
-    console.log("Access key:", process.env.AWS_ACCESS_KEY);
-    console.log("Secret key:", process.env.AWS_SECRET_KEY);
-    console.log("Region:", process.env.AWS_REGION);
 
     if (!filetype.startsWith("image/")) {
       return NextResponse.json(
@@ -33,8 +25,6 @@ export async function POST(
     }
 
     // const key = `${params.context}/${filename}`;
-
-    console.log("Generating signed URL for:", filename);
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: filename,
@@ -42,8 +32,6 @@ export async function POST(
     });
 
     const url = await getSignedUrl(s3Client, command, { expiresIn: 60 });
-
-    console.log("Generated signed URL:", url);
     return NextResponse.json({ url, key: filename });
   } catch (error) {
     console.error("S3 Pre-Signed URL Error:", error);

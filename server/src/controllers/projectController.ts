@@ -75,7 +75,6 @@ export const createProject = async (
   try {
     const { name, description, startDate, endDate, imageUrl, imageName } =
       req.body;
-    console.log(req.user);
     const project = await prisma.project.create({
       data: {
         name,
@@ -110,7 +109,6 @@ export const deleteProject = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    console.log(id);
     await prisma.project.delete({
       where: {
         id: id,
@@ -118,7 +116,6 @@ export const deleteProject = async (
     });
     res.status(200).json({ message: "Project deleted successfully" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

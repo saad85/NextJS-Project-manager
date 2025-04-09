@@ -11,9 +11,6 @@ const prisma = new PrismaClient();
 const JWT_SECRET = (process.env.JWT_SECRET as string) || "supersecretkey";
 const JWT_EXPIRATION = (process.env.JWT_EXPIRATION as string) || "1h";
 
-console.log("JWT_SECRET:", JWT_SECRET);
-console.log("JWT_EXPIRATION:", JWT_EXPIRATION);
-
 // Signup Validation Schema
 const signupSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -32,35 +29,17 @@ const signupSchema = z.object({
 });
 
 export const signupService = async (data: any) => {
-  // Validate data
-  console.log(data);
-  //   const validatedData = signupSchema.parse(data);
-  //   const {
-  //     firstName,
-  //     lastName,
-  //     email,
-  //     phone,
-  //     password,
-  //     role,
-  //     organizationName,
-  //     subdomain,
-  //   } = validatedData;
-  //   console.log("existingUser", validatedData);
-  // Check if email or phone already exists
   const existingUser = await prisma.user.findFirst({
     where: { OR: [{ email: data.email }, { phone: data.phone }] },
   });
-  console.log("existingUser", existingUser);
   if (existingUser) {
     throw new Error("Email or phone already in use");
   }
 
-  // Check if subdomain exists
-  console.log("existingOrg", data.subDomain);
   const existingOrg = await prisma.organization.findUnique({
     where: { subdomain: data.subDomain },
   });
-  console.log("existingOrg", existingOrg);
+
   if (existingOrg) {
     throw new Error("Subdomain is already in use");
   }
@@ -72,8 +51,6 @@ export const signupService = async (data: any) => {
   const roleName = data.role || "User";
   let userRole = await prisma.role.findUnique({ where: { name: roleName } });
 
-  console.log("userRole", userRole);
-
   if (!userRole) {
     // throw new Error("Role not found");
     userRole = await prisma.role.create({
@@ -81,7 +58,6 @@ export const signupService = async (data: any) => {
     });
   }
 
-  console.log("userRole", userRole);
   // Create Organization & Settings
   const organization = await prisma.organization.create({
     data: {
@@ -95,8 +71,6 @@ export const signupService = async (data: any) => {
       },
     },
   });
-
-  console.log("organization", organization);
 
   // Create User and Associate with Organization
   const user = await prisma.user.create({
@@ -129,8 +103,6 @@ export const signupService = async (data: any) => {
     },
   });
 
-  console.log("createdOrganizationUser", createdOrganizationUser);
-
   // Create User Role
   const createdUserRole = await prisma.orgUserRole.create({
     data: {
@@ -139,10 +111,6 @@ export const signupService = async (data: any) => {
       orgId: organization.id,
     },
   });
-
-  console.log("createdUserRole", createdUserRole);
-
-  console.log("user", user);
 
   return user;
 };
@@ -153,11 +121,6 @@ const loginSchema = z.object({
 });
 
 export const loginService = async (data: any) => {
-  //   const validatedData = loginSchema.parse(data);
-  //   const { email, password } = validatedData;
-
-  // Find user by email
-  console.log("data", data);
   const user = await prisma.user.findUnique({
     where: { email: data.email },
     include: {
@@ -174,8 +137,6 @@ export const loginService = async (data: any) => {
       },
     },
   });
-
-  console.log("user in login", user);
 
   if (!user) {
     throw new Error("Invalid credentials");
@@ -198,7 +159,7 @@ export const loginService = async (data: any) => {
   };
 
   const signOptions: SignOptions = {
-    expiresIn: "1h",
+    expiresIn: "10h",
     algorithm: "HS256",
   };
 

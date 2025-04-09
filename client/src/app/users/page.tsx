@@ -7,7 +7,7 @@ import {
 } from "@/state/api";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Mail, User, Users as TeamIcon } from "lucide-react";
+import { Loader2, Mail, User, Users as TeamIcon, Phone } from "lucide-react";
 import Header from "@/components/Header";
 import { NewUserModal } from "@/app/users/NewUserModal";
 
@@ -44,6 +44,12 @@ const UserCard = ({ user }: { user: any }) => {
             <span>Team ID: {user.teamId}</span>
           </div>
         )}
+        {user.phone && (
+          <div className="flex items-center gap-2 text-sm">
+            <Phone className="h-4 w-4 text-gray-500" />
+            <span>{user.phone}</span>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -56,7 +62,6 @@ const UsersPage = () => {
   const [createOrgUser] = useCreateOrgUserMutation();
 
   const handleCreateUser = (newUser: OrgUserInput) => {
-    console.log("Creating new user:", newUser);
     createOrgUser({
       firstName: newUser.firstName,
       lastName: newUser.lastName,

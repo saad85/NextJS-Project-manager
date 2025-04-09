@@ -54,7 +54,6 @@ export function SignupForm() {
     }
 
     try {
-      console.log(data);
       const userData = await register({
         firstName: data.firstName,
         lastName: data.lastName,

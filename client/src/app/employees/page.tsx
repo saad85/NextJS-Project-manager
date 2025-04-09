@@ -28,7 +28,9 @@ import { getSignedUrl } from "@/utils/AWS";
 const EmployeesPage = () => {
   const router = useRouter();
   const [isModalNewEmployeeOpen, setIsModalNewEmployeeOpen] = useState(false);
-  const { data: employees, isLoading } = useGetEmployeesQuery();
+  const { data: orgUsers, isLoading } = useGetEmployeesQuery();
+
+  const employees = orgUsers?.map((orgUser) => orgUser.user);
 
   // Handle navigation to employee details
   const handleViewDetails = (employeeId: string) => {
@@ -67,7 +69,7 @@ const EmployeesPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {employees.map((employee) => (
             <Card
-              key={employee.id}
+              key={employee.userId}
               className="hover:shadow-lg transition-shadow"
             >
               {/* Rounded Avatar Image */}
@@ -141,7 +143,7 @@ const EmployeesPage = () => {
               </CardContent>
               <CardFooter className="p-4 flex justify-center">
                 <Button
-                  onClick={() => handleViewDetails(employee.id)}
+                  onClick={() => handleViewDetails(employee.userId)}
                   className="bg-black text-white hover:bg-gray-900"
                   size="sm"
                 >

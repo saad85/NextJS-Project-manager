@@ -31,7 +31,7 @@ export enum Status {
 }
 
 export interface User {
-  userId?: number;
+  userId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -39,6 +39,9 @@ export interface User {
   cognitoId?: string;
   teamId?: number;
   phone?: string;
+  position?: string;
+  department?: string;
+  hireDate?: string;
 }
 
 export interface Attachment {
@@ -118,6 +121,9 @@ export interface OrgUserInput {
   email: string;
   phoneNumber: string;
   roles: RoleName[];
+  position?: string;
+  department?: string;
+  hireDate?: string;
 }
 
 export const api = createApi({
@@ -195,7 +201,7 @@ export const api = createApi({
           ? result.map(({ id }) => ({ type: "Tasks", id }))
           : [{ type: "Tasks", id: userId }],
     }),
-    getEmployees: build.query<Employee[], void>({
+    getEmployees: build.query<OrgUser[], void>({
       query: () => "employees",
       providesTags: ["Employees"],
     }),

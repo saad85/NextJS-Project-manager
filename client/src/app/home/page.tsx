@@ -40,7 +40,6 @@ const taskColumns: GridColDef[] = [
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const HomePage = ({ subdomain }: { subdomain: string }) => {
-  console.log("subdomain", subdomain);
   const { data: projects, isLoading: isProjectsLoading } =
     useGetProjectsQuery();
   const {

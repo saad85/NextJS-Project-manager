@@ -1,6 +1,10 @@
 "use client";
 
-import { useCreateEmployeeMutation } from "@/state/api";
+import {
+  RoleName,
+  useCreateEmployeeMutation,
+  useCreateOrgUserMutation,
+} from "@/state/api";
 import { formatISO } from "date-fns";
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
@@ -32,7 +36,7 @@ const EmployeeModal = ({ isOpen, onClose }: EmployeeModalProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const [createEmployee, { isLoading }] = useCreateEmployeeMutation();
+  const [createOrgUser, { isLoading }] = useCreateOrgUserMutation();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -109,10 +113,11 @@ const EmployeeModal = ({ isOpen, onClose }: EmployeeModalProps) => {
         position: position || undefined,
         department: department || undefined,
         hireDate: formattedHireDate || undefined,
-        phone: phone || undefined,
+        phoneNumber: phone || "",
+        roles: ["Employee"] as RoleName[],
       };
 
-      await createEmployee(employeeData).unwrap();
+      await createOrgUser(employeeData).unwrap();
       onClose();
       resetForm();
     } catch (error) {

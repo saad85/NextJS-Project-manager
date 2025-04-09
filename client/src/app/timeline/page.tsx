@@ -10,11 +10,8 @@ import React, { useMemo, useState } from "react";
 type TaskTypeItems = "task" | "milestone" | "project";
 
 const Timeline = () => {
-  console.log("TIMELINE PAGE PREPARING");
-
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const { data: projects, isLoading, isError } = useGetProjectsQuery();
-  console.log("PROJECTS LOADED");
 
   const [displayOptions, setDisplayOptions] = useState<DisplayOption>({
     viewMode: ViewMode.Month,
@@ -34,7 +31,6 @@ const Timeline = () => {
       })) || []
     );
   }, [projects]);
-  console.log("TASKS LOADED");
 
   const handleViewModeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -48,8 +44,6 @@ const Timeline = () => {
   if (isLoading) return <div>Loading...</div>;
   if (isError || !projects)
     return <div>An error occurred while fetching projects</div>;
-
-  console.log("TASKS LOADED 2");
   return (
     <div className="max-w-full p-8">
       <header className="mb-4 flex items-center justify-between">

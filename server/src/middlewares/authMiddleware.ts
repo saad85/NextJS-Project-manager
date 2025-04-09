@@ -21,8 +21,6 @@ export const authenticateUser = async (
     // 1. Check for Authorization header
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1]; // Bearer <token>
-
-    console.log("Token:", token);
     if (!token) {
       return res.status(401).json({ error: "Authorization token required" });
     }
@@ -36,8 +34,6 @@ export const authenticateUser = async (
       exp: number;
     };
 
-    console.log("Decoded:", decoded);
-
     // 3. Find user in database
     const user = await prisma.user.findUnique({
       where: { userId: decoded.userId },
@@ -49,8 +45,6 @@ export const authenticateUser = async (
         },
       },
     });
-
-    console.log("User organizationUsers:", user?.organizationUsers);
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });

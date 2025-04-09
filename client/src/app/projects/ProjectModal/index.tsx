@@ -67,11 +67,6 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
       });
 
       const { url, key } = await response.json();
-
-      console.log("Upload URL:", url);
-      console.log("Upload Key:", key);
-      console.log("File:", file);
-      console.log("File Type:", file.type);
       // Upload the file to S3 using the pre-signed URL
       const uploadResponse = await fetch(url, {
         method: "PUT",
@@ -80,8 +75,6 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
           "Content-Type": file.type,
         },
       });
-
-      console.log("Upload Response:", uploadResponse.text());
 
       if (!uploadResponse.ok) {
         throw new Error("Upload failed");
@@ -100,7 +93,6 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
 
     try {
       let imageKey = null;
-      console.log("Uploading image:", file);
       if (file) {
         imageKey = await uploadToS3(file);
       }

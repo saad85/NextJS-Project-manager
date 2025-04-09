@@ -13,7 +13,6 @@ export const getUsers = async (req: Request, res: Response) => {
         user: true,
       },
     });
-    console.log("Org Users:", orgUsers);
     res.status(200).json(orgUsers);
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
@@ -48,7 +47,7 @@ export const createOrgUser = async (req: Request, res: Response) => {
       });
       const existingRoles = await prisma.role.findMany({
         where: {
-          name: roles,
+          name: { in: roles },
         },
       });
 
@@ -82,7 +81,7 @@ export const createOrgUser = async (req: Request, res: Response) => {
       });
       const existingRoles = await prisma.role.findMany({
         where: {
-          name: roles,
+          name: { in: roles },
         },
       });
       if (!existingRoles) {
@@ -98,6 +97,7 @@ export const createOrgUser = async (req: Request, res: Response) => {
       res.status(200).json(user);
     }
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

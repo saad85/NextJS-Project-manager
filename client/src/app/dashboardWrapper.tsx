@@ -59,10 +59,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
-  console.log("DashboardWrapper");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const token = Cookies.get("auth-token");
-  console.log("Found token:", token);
   useEffect(() => {
     setIsAuthenticated(!!token);
   }, [token]);
@@ -75,7 +73,6 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-  console.log("isAuthenticated:", isAuthenticated);
 
   return (
     <StoreProvider>
