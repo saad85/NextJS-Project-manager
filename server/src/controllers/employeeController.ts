@@ -7,7 +7,7 @@ export const getEmployees = async (req: Request, res: Response) => {
   try {
     const employees = await prisma.organizationUser.findMany({
       where: {
-        organizationId: req.user.orgId,
+        orgId: req.user.orgId,
         orgUserRoles: {
           some: {
             role: {

@@ -10,7 +10,7 @@ export const getProjects = async (
   try {
     const projects = await prisma.project.findMany({
       where: {
-        organizationId: req.user.orgId,
+        orgId: req.user.orgId,
       },
       include: {
         _count: {
@@ -35,8 +35,6 @@ export const getProjects = async (
         },
       },
     });
-
-    console.log("projects", projects);
 
     // Process the projects to calculate totals
     const projectsWithTaskCounts = projects.map((project) => {
@@ -70,7 +68,7 @@ export const getProjectById = async (
     const project = await prisma.project.findUnique({
       where: {
         id: id,
-        organizationId: req.user.orgId,
+        orgId: req.user.orgId,
       },
     });
     res.status(200).json(project);
@@ -99,7 +97,7 @@ export const createProject = async (
         description,
         startDate,
         endDate,
-        organizationId: req.user.orgId,
+        orgId: req.user.orgId,
       },
     });
     if (project) {

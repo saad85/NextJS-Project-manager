@@ -33,6 +33,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { User as UserType } from "@/state/api";
+import dynamic from "next/dynamic";
+
+const SidebarLinkComponent = dynamic(() => import("./SidebarLink"), {
+  ssr: false,
+});
 
 const Sidebar = () => {
   const router = useRouter();
@@ -107,12 +112,24 @@ const Sidebar = () => {
 
         {/* NAVBAR LINKS */}
         <nav className="z-10 w-full">
-          <SidebarLink icon={Home} label="Home" href="/" />
-          <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
-          <SidebarLink icon={Users} label="Employees" href="/employees" />
-          <SidebarLink icon={Settings} label="Settings" href="/settings" />
-          <SidebarLink icon={User} label="Users" href="/users" />
-          <SidebarLink icon={Users} label="Teams" href="/teams" />
+          <SidebarLinkComponent icon={Home} label="Home" href="/" />
+          <SidebarLinkComponent
+            icon={Briefcase}
+            label="Timeline"
+            href="/timeline"
+          />
+          <SidebarLinkComponent
+            icon={Users}
+            label="Employees"
+            href="/employees"
+          />
+          <SidebarLinkComponent
+            icon={Settings}
+            label="Settings"
+            href="/settings"
+          />
+          <SidebarLinkComponent icon={User} label="Users" href="/users" />
+          <SidebarLinkComponent icon={Users} label="Teams" href="/teams" />
         </nav>
 
         {/* PROJECTS LINKS */}
@@ -134,7 +151,7 @@ const Sidebar = () => {
         {/* PROJECTS LIST */}
         {showProjects &&
           projects?.map((project) => (
-            <SidebarLink
+            <SidebarLinkComponent
               key={project.id}
               icon={Briefcase}
               label={project.name}
@@ -157,23 +174,27 @@ const Sidebar = () => {
 
         {showPriority && (
           <>
-            <SidebarLink
+            <SidebarLinkComponent
               icon={AlertCircle}
               label="Urgent"
               href="/priority/urgent"
             />
-            <SidebarLink
+            <SidebarLinkComponent
               icon={ShieldAlert}
               label="High"
               href="/priority/high"
             />
-            <SidebarLink
+            <SidebarLinkComponent
               icon={AlertTriangle}
               label="Medium"
               href="/priority/medium"
             />
-            <SidebarLink icon={AlertOctagon} label="Low" href="/priority/low" />
-            <SidebarLink
+            <SidebarLinkComponent
+              icon={AlertOctagon}
+              label="Low"
+              href="/priority/low"
+            />
+            <SidebarLinkComponent
               icon={Layers3}
               label="Backlog"
               href="/priority/backlog"
@@ -227,44 +248,44 @@ const Sidebar = () => {
   );
 };
 
-interface SidebarLinkProps {
-  href: string;
-  icon: LucideIcon;
-  label: string;
-  key?: string | number | undefined;
-}
+// interface SidebarLinkProps {
+//   href: string;
+//   icon: LucideIcon;
+//   label: string;
+//   key?: string | number | undefined;
+// }
 
-const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [isLoading, setIsLoading] = useState(false);
+// const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
+//   const router = useRouter();
+//   const [isPending, startTransition] = useTransition();
+//   const [isLoading, setIsLoading] = useState(false);
 
-  const dispatch = useAppDispatch();
+//   const dispatch = useAppDispatch();
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    dispatch(setLoading(true));
-    setIsLoading(true);
-    startTransition(() => {
-      router.push(href);
-      setIsLoading(false);
-    });
-  };
+//   const handleClick = (e: React.MouseEvent) => {
+//     e.preventDefault();
+//     dispatch(setLoading(true));
+//     setIsLoading(true);
+//     startTransition(() => {
+//       router.push(href);
+//       setIsLoading(false);
+//     });
+//   };
 
-  return (
-    <div className="w-full cursor-pointer" onClick={handleClick}>
-      <div className="relative flex items-center gap-3 px-8 py-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700">
-        {isLoading ? (
-          <Loader2 className="h-6 w-6 animate-spin text-gray-800 dark:text-gray-100" />
-        ) : (
-          <Icon className="h-6 w-6 text-gray-800 dark:text-gray-100" />
-        )}
-        <span className="font-medium text-gray-800 dark:text-gray-100">
-          {label}
-        </span>
-      </div>
-    </div>
-  );
-};
+//   return (
+//     <div className="w-full cursor-pointer" onClick={handleClick}>
+//       <div className="relative flex items-center gap-3 px-8 py-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700">
+//         {isLoading ? (
+//           <Loader2 className="h-6 w-6 animate-spin text-gray-800 dark:text-gray-100" />
+//         ) : (
+//           <Icon className="h-6 w-6 text-gray-800 dark:text-gray-100" />
+//         )}
+//         <span className="font-medium text-gray-800 dark:text-gray-100">
+//           {label}
+//         </span>
+//       </div>
+//     </div>
+//   );
+// };
 
 export default Sidebar;

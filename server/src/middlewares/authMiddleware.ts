@@ -40,7 +40,7 @@ export const authenticateUser = async (
       include: {
         organizationUsers: {
           where: {
-            organizationId: decoded.orgId,
+            orgId: decoded.orgId,
           },
         },
       },
@@ -63,7 +63,7 @@ export const authenticateUser = async (
       orgUserId: user.organizationUsers[0].id,
       userId: user.userId,
       roleId: decoded.roleId,
-      orgId: user.organizationUsers[0].organizationId,
+      orgId: user.organizationUsers[0].orgId,
     };
 
     // 5. Proceed to next middleware

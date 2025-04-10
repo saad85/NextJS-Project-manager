@@ -94,11 +94,11 @@ export const signupService = async (data: any) => {
   const createdOrganizationUser = await prisma.organizationUser.create({
     data: {
       userId: user.userId,
-      organizationId: organization.id,
+      orgId: organization.id,
     },
     select: {
       userId: true,
-      organizationId: true,
+      orgId: true,
       id: true,
     },
   });
@@ -138,6 +138,8 @@ export const loginService = async (data: any) => {
     },
   });
 
+  console.log("user", user);
+
   if (!user) {
     throw new Error("Invalid credentials");
   }
@@ -155,8 +157,10 @@ export const loginService = async (data: any) => {
   const payload = {
     userId: user.userId,
     roleId: user.organizationUsers[0].orgUserRoles[0].roleId,
-    orgId: user.organizationUsers[0].organizationId,
+    orgId: user.organizationUsers[0].orgId,
   };
+
+  console.log("payload", payload);
 
   const signOptions: SignOptions = {
     expiresIn: "10h",
@@ -164,6 +168,8 @@ export const loginService = async (data: any) => {
   };
 
   const token = jwt.sign(payload, secretKey, signOptions);
+
+  console.log("token", token);
 
   return {
     token,

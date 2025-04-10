@@ -7,7 +7,7 @@ export const getUsers = async (req: Request, res: Response) => {
   try {
     const orgUsers = await prisma.organizationUser.findMany({
       where: {
-        organizationId: req.user.orgId,
+        orgId: req.user.orgId,
       },
       include: {
         user: true,
@@ -30,9 +30,9 @@ export const createOrgUser = async (req: Request, res: Response) => {
     if (existingUser) {
       const existingOrgUser = await prisma.organizationUser.findUnique({
         where: {
-          userId_organizationId: {
+          userId_orgId: {
             userId: existingUser.userId,
-            organizationId: req.user.orgId,
+            orgId: req.user.orgId,
           },
         },
       });
@@ -42,7 +42,7 @@ export const createOrgUser = async (req: Request, res: Response) => {
       const orgUser = await prisma.organizationUser.create({
         data: {
           userId: existingUser.userId,
-          organizationId: req.user.orgId,
+          orgId: req.user.orgId,
         },
       });
       const existingRoles = await prisma.role.findMany({
@@ -76,7 +76,7 @@ export const createOrgUser = async (req: Request, res: Response) => {
       const orgUser = await prisma.organizationUser.create({
         data: {
           userId: user.userId,
-          organizationId: req.user.orgId,
+          orgId: req.user.orgId,
         },
       });
       const existingRoles = await prisma.role.findMany({

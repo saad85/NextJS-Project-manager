@@ -45,9 +45,9 @@ const Timeline = () => {
         isDisabled: false,
         styles: {
           backgroundColor: isDarkMode ? "#36598C" : "#7F00FF",
-          backgroundSelectedColor: isDarkMode ? "#4a7abf" : "#9d4dff",
-          progressColor: isDarkMode ? "#2d4a6e" : "#6a00cc",
-          progressSelectedColor: isDarkMode ? "#3a5a8a" : "#8a2be2",
+          backgroundSelectedColor: isDarkMode ? "#4a7abf" : "#7F00FF",
+          progressColor: isDarkMode ? "#2d4a6e" : "#7F00FF",
+          progressSelectedColor: isDarkMode ? "#3a5a8a" : "#FFFFFF",
         },
       })) || []
     );
@@ -131,7 +131,7 @@ const Timeline = () => {
               rowHeight={48}
               fontSize="14px"
               barCornerRadius={6}
-              // arrowColor={isDarkMode ? "#94a3b8" : "#64748b"}
+              arrowColor={isDarkMode ? "#94a3b8" : "#64748b"}
               arrowIndent={20}
               todayColor={
                 isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"

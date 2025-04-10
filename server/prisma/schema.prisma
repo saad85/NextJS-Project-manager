@@ -8,53 +8,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model User {
-//   userId            String  @id @default(uuid())
-//   cognitoId         String  @unique
-//   username          String  @unique
-//   profilePictureUrl String?
-//   teamId            String?
-
-//   authoredTasks   Task[]           @relation("TaskAuthor")
-//   assignedTasks   Task[]           @relation("TaskAssignee")
-//   taskAssignments TaskAssignment[]
-//   attachments     Attachment[]
-//   comments        Comment[]
-//   team            Team?            @relation(fields: [teamId], references: [id])
-// }
-
 model Team {
   id                   String        @id @default(uuid())
   teamName             String
   productOwnerUserId   String?
   projectManagerUserId String?
+  orgId  String
   projectTeams         ProjectTeam[]
   user                 User[]
+  Employee             Employee[]
+  organization         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt            DateTime     @default(now())
+  createdBy            String?
 
-  Employee Employee[]
+  @@index([orgId])
 }
 
 model Project {
-  id           String        @id @default(uuid())
-  name         String
-  description  String?
-  startDate    DateTime?
-  endDate      DateTime?
-  organizationId String
-
-  tasks        Task[]
-  projectTeams ProjectTeam[]
-  attachments  Attachment[]
+  id              String           @id @default(uuid())
+  name            String
+  description     String?
+  startDate       DateTime?
+  endDate         DateTime?
+  orgId  String
+  tasks           Task[]
+  projectTeams    ProjectTeam[]
+  attachments     Attachment[]
   projectManagers ProjectManager[]
+  createdAt       DateTime         @default(now())
+  createdBy       String?
+
+  @@index([orgId])
 }
 
 model ProjectManager {
-  id String @id @default(uuid())
-  orgUserId String 
+  id        String           @id @default(uuid())
+  orgUserId String
   projectId String
+  orgUser   OrganizationUser @relation(fields: [orgUserId], references: [id], onDelete: Cascade)
+  project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime         @default(now())
+  createdBy String?
 
-  orgUser OrganizationUser @relation(fields: [orgUserId], references: [id], onDelete: Cascade)
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  @@index([orgUserId, projectId])
 }
 
 model ProjectTeam {
@@ -63,6 +59,10 @@ model ProjectTeam {
   projectId String
   team      Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  createdBy String?
+
+  @@index([teamId, projectId])
 }
 
 enum TaskStatus {
@@ -90,126 +90,157 @@ model Task {
   startDate      DateTime?
   dueDate        DateTime?
   points         Int?
-  projectId      String 
+  projectId      String
   authorUserId   String
   assignedUserId String?
-
-  project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  author          User             @relation("TaskAuthor", fields: [authorUserId], references: [userId], onDelete: Cascade)
-  assignee        User?            @relation("TaskAssignee", fields: [assignedUserId], references: [userId], onDelete: SetNull)
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author         OrganizationUser            @relation("TaskAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
+  assignee       OrganizationUser?           @relation("TaskAssignee", fields: [assignedUserId], references: [id], onDelete: SetNull)
   taskAssignments TaskAssignment[]
   attachments     Attachment[]
   comments        Comment[]
+  createdAt       DateTime        @default(now())
+  createdBy       String?
+
+  @@index([projectId])
+  @@index([authorUserId])
+  @@index([assignedUserId])
+  @@index([status])
+  @@index([priority])
+  @@index([tags])
+  @@index([startDate])
+  @@index([dueDate])
+  @@index([points])
 }
 
 model TaskAssignment {
   id     String @id @default(uuid())
-  userId String
+  orgUserId String
   taskId String
+  orgUser   OrganizationUser   @relation(fields: [orgUserId], references: [id])
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  createdBy String?
 
-  user User @relation(fields: [userId], references: [userId])
-  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  @@index([orgUserId, taskId])
+  @@index([taskId])
 }
 
 model Attachment {
-  id           String @id @default(uuid())
-  fileURL      String
-  fileName     String?
-  taskId       String?
-  uploadedById String?
-  projectId    String?
-
-  task       Task? @relation(fields: [taskId], references: [id])
-  uploadedBy User? @relation(fields: [uploadedById], references: [userId])
-  project    Project? @relation(fields: [projectId], references: [id])
+  id              String  @id @default(uuid())
+  fileURL         String
+  fileName        String?
+  taskId          String?
+  uploadedById    String?
+  projectId       String?
+  task            Task?   @relation(fields: [taskId], references: [id])
+  uploadedBy      User?   @relation(fields: [uploadedById], references: [userId])
+  project         Project? @relation(fields: [projectId], references: [id])
+  createdAt       DateTime @default(now())
+  createdBy       String?
 }
 
 model Comment {
-  id     String @id @default(uuid())
-  text   String
-  taskId String
-  userId String
+  id        String @id @default(uuid())
+  text      String
+  taskId    String
+  orgUserId    String
+  task      Task   @relation(fields: [taskId], references: [id])
+  orgUser   OrganizationUser   @relation(fields: [orgUserId], references: [id])
+  createdAt DateTime @default(now())
+  createdBy String?
 
-  task Task @relation(fields: [taskId], references: [id])
-  user User @relation(fields: [userId], references: [userId])
+  @@index([orgUserId, taskId])
+  @@index([taskId])
 }
 
 model Employee {
-  id String @id @default(uuid())
-  firstName String
-  lastName String
-  email String
+  id                String  @id @default(uuid())
+  firstName         String
+  lastName          String
+  email             String
   profilePictureUrl String?
-  position String?
-  department String?
-  hireDate DateTime
-  phone String?
-  teamId String?
-
-  team Team? @relation(fields: [teamId], references: [id])
+  position          String?
+  department        String?
+  hireDate          DateTime
+  phone             String?
+  teamId            String?
+  team              Team?   @relation(fields: [teamId], references: [id])
+  createdAt         DateTime @default(now())
+  createdBy         String?
 }
 
 model OrganizationUser {
-  id             String       @id @default(uuid())
-  userId         String
-  organizationId String
-  role           String       @default("Admin") // Can be Admin, Member, etc.
-  joinedAt       DateTime     @default(now())
-
-  user          User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  orgUserRoles  OrgUserRole[]
+  id              String              @id @default(uuid())
+  userId          String
+  orgId  String
+  role            String              @default("Admin")
+  joinedAt        DateTime            @default(now())
+  user            User                @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  organization    Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgUserRoles    OrgUserRole[]
   projectManagers ProjectManager[]
+  taskAssignments TaskAssignment[]
+  taskAuthor      Task[]              @relation("TaskAuthor")
+  taskAssignee    Task[]              @relation("TaskAssignee")
+  comments        Comment[]
+  createdAt       DateTime            @default(now())
+  createdBy       String?
 
-  @@unique([userId, organizationId]) // Ensures a user can't join the same organization multiple times
+  @@unique([userId, orgId])
+  @@index([orgId])
 }
 
 model OrgUserRole {
-  id     String @id @default(uuid())
+  id        String  @id @default(uuid())
   orgUserId String
-  orgId String
-  roleId String
+  orgId     String
+  roleId    String
+  orgUser   OrganizationUser @relation(fields: [orgUserId], references: [id], onDelete: Cascade)
+  role      Role              @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt DateTime          @default(now())
+  createdBy String?
 
-  orgUser OrganizationUser @relation(fields: [orgUserId], references: [id], onDelete: Cascade)
-  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
-
-  @@unique([orgUserId, roleId]) // Ensures a user can't have the same role multiple times
+  @@unique([orgUserId, roleId])
+  @@index([orgId])
 }
 
 model User {
-  userId        String        @id @default(uuid())
-  firstName     String
-  lastName      String
-  email         String        @unique
-  phone         String?        @unique
-  password      String?
-  createdAt     DateTime      @default(now())
-
-  // Relationships
+  userId          String               @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String               @unique
+  phone           String?              @unique
+  password        String?
+  createdAt       DateTime             @default(now())
   organizationUsers OrganizationUser[]
-  authoredTasks     Task[]           @relation("TaskAuthor")
-  assignedTasks     Task[]           @relation("TaskAssignee")
-  taskAssignments   TaskAssignment[]
   attachments       Attachment[]
-  comments          Comment[]
   teamId            String?
-  team              Team?             @relation(fields: [teamId], references: [id])
+  team              Team?              @relation(fields: [teamId], references: [id])
   profile           Profile?
+  createdBy         String?
+
+  @@index([userId])
+  @@index([email])
+  @@index([phone])
 }
 
 model Profile {
-  id String @id @default(uuid())
-  userId String @unique
-  firstName String
-  lastName String
-  email String
+  id                String  @id @default(uuid())
+  userId            String  @unique
+  firstName         String
+  lastName          String
+  email             String
   profilePictureUrl String?
-  position String?
-  department String?
-  hireDate DateTime
-  phone String?
+  position          String?
+  department        String?
+  hireDate          DateTime
+  phone             String?
+  user              User    @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  createdBy         String?
 
-  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  @@index([userId])
 }
 
 enum RoleName {
@@ -219,27 +250,37 @@ enum RoleName {
 }
 
 model Role {
-  id    String  @id @default(uuid())
-  name  RoleName  @unique @default(Admin)
-
+  id           String        @id @default(uuid())
+  name         RoleName      @unique @default(Admin)
   orgUserRoles OrgUserRole[]
+  createdAt    DateTime      @default(now())
+  createdBy    String?
+  
+  @@index([name])
 }
 
 model Organization {
-  id          String               @id @default(uuid())
-  name        String
-  subdomain   String               @unique
-  createdAt   DateTime             @default(now())
+  id                  String                @id @default(uuid())
+  name                String
+  subdomain           String                @unique
+  createdAt           DateTime              @default(now())
+  organizationUsers   OrganizationUser[]
+  settings            OrganizationSettings?
+  teams               Team[]
+  createdBy           String?
 
-  organizationUsers OrganizationUser[]
-  settings          OrganizationSettings?
+  @@index([subdomain])
+  @@index([id])
 }
 
 model OrganizationSettings {
-  id              String        @id @default(uuid())
-  organization    Organization  @relation(fields: [organizationId], references: [id])
-  organizationId  String        @unique
-  allowGuests     Boolean       @default(false)
-  timezone        String        @default("UTC")
-  createdAt       DateTime      @default(now())
+  id              String       @id @default(uuid())
+  organization    Organization @relation(fields: [orgId], references: [id])
+  orgId  String       @unique
+  allowGuests     Boolean      @default(false)
+  timezone        String       @default("UTC")
+  createdAt       DateTime     @default(now())
+  createdBy       String?
+
+  @@index([orgId])
 }
