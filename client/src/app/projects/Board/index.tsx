@@ -2,7 +2,7 @@ import { useGetTasksQuery, useUpdateTaskStatusMutation } from "@/state/api";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Task as TaskType } from "@/state/api";
-import { EllipsisVertical, MessageSquareMore, Plus } from "lucide-react";
+import { EllipsisVertical, MessageSquareMore, Plus, User } from "lucide-react";
 import { format } from "date-fns";
 import Image from "next/image";
 import { getSignedUrl } from "@/utils/AWS";
@@ -223,26 +223,45 @@ const Task = ({ task }: TaskProps) => {
         <div className="mt-4 border-t border-gray-200 dark:border-stroke-dark" />
         <div className="mt-3 flex items-center justify-between">
           <div className="flex -space-x-[6px] overflow-hidden">
-            {task.assignee && (
-              <Image
-                key={task.assignee.userId}
-                src={`/${task.assignee.profilePictureUrl!}`}
-                alt={task.assignee.username}
-                width={30}
-                height={30}
-                className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
-              />
-            )}
-            {task.author && (
-              <Image
-                key={task.author.userId}
-                src={`/${task.author.profilePictureUrl!}`}
-                alt={task.author.username}
-                width={30}
-                height={30}
-                className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
-              />
-            )}
+            {task.taskAssignments &&
+              task.taskAssignments.length > 0 &&
+              task.taskAssignments.map((taskAssignment) =>
+                taskAssignment.orgUser.user.profilePictureUrl ? (
+                  <Image
+                    key={taskAssignment.orgUser.userId}
+                    src={`/${taskAssignment.orgUser.user.profilePictureUrl!}`}
+                    alt={
+                      taskAssignment.orgUser.user.firstName +
+                      " " +
+                      taskAssignment.orgUser.user.lastName
+                    }
+                    width={30}
+                    height={30}
+                    className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center dark:bg-dark-secondary">
+                    <User className="w-4 h-4 text-gray-500 dark:text-neutral-500" />
+                  </div>
+                )
+              )}
+            {task.author &&
+              (task.author.user.profilePictureUrl ? (
+                <Image
+                  key={task.author.id}
+                  src={`/${task.author.user.profilePictureUrl!}`}
+                  alt={
+                    task.author.user.firstName + " " + task.author.user.lastName
+                  }
+                  width={30}
+                  height={30}
+                  className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
+                />
+              ) : (
+                <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center dark:bg-dark-secondary">
+                  <User className="w-4 h-4 text-gray-500 dark:text-neutral-500" />
+                </div>
+              ))}
           </div>
           <div className="flex items-center text-gray-500 dark:text-neutral-500">
             <MessageSquareMore size={20} />

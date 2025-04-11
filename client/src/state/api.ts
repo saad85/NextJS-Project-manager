@@ -60,6 +60,13 @@ export interface Attachment {
   uploadedById: number;
 }
 
+export interface TaskAssignment {
+  id: string;
+  taskId: string;
+  orgUserId: string;
+  orgUser: OrgUser;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -74,11 +81,13 @@ export interface Task {
   authorUserId?: string;
   assignedUserId?: string | null;
   attachmentUrl?: string;
+  assignedIds: string[];
 
-  author?: User;
+  author?: OrgUser;
   assignee?: User;
   comments?: Comment[];
   attachments?: Attachment[];
+  taskAssignments?: TaskAssignment[];
 }
 
 export interface Team {

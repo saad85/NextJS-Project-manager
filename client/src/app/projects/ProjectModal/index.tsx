@@ -167,13 +167,9 @@ const ProjectModal = ({ isOpen, onClose }: ProjectModalProps) => {
   };
 
   const handleCommandFocus = () => {
-    console.log("handleCommandFocus");
     setIsCommandOpen(true);
-    console.log("isCommandOpen", isCommandOpen);
-    console.log("orgUsers", orgUsers);
     if (!orgUsers) {
       getOrgUsers();
-      console.log("getOrgUsers", orgUsers);
     }
   };
 

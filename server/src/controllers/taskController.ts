@@ -1,3 +1,4 @@
+import { sendSms } from "../services/notification/notificationService";
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
@@ -11,10 +12,22 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
         projectId: projectId,
       },
       include: {
-        author: true,
-        assignee: true,
+        author: {
+          include: {
+            user: true,
+          },
+        },
         comments: true,
         attachments: true,
+        taskAssignments: {
+          include: {
+            orgUser: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
       },
     });
     res.status(200).json(tasks);
@@ -41,36 +54,59 @@ export const createTask = async (
       authorUserId,
       assignedUserId,
       attachmentUrl,
+      assignedIds,
     } = req.body;
-    const task = await prisma.task.create({
-      data: {
-        title,
-        description,
-        status,
-        priority,
-        tags,
-        startDate,
-        dueDate,
-        points,
-        projectId,
-        authorUserId,
-        assignedUserId,
-      },
-    });
-    if (attachmentUrl) {
-      await prisma.attachment.create({
+
+    if (!title || !authorUserId || !projectId || !assignedIds?.length) {
+      throw new Error("Missing required fields");
+    }
+
+    const result = await prisma.$transaction(async (prisma) => {
+      const task = await prisma.task.create({
         data: {
-          fileURL: attachmentUrl,
-          taskId: task.id,
-          uploadedById: authorUserId,
+          title,
+          description,
+          status,
+          priority,
+          tags,
+          startDate,
+          dueDate,
+          points,
+          projectId,
+          authorUserId,
         },
       });
-    }
-    res.status(201).json(task);
+
+      if (assignedIds?.length) {
+        await prisma.taskAssignment.createMany({
+          data: assignedIds.map((id: string) => ({
+            orgUserId: id,
+            taskId: task.id,
+          })),
+        });
+      }
+
+      if (attachmentUrl) {
+        await prisma.attachment.create({
+          data: {
+            fileURL: attachmentUrl,
+            taskId: task.id,
+            uploadedById: authorUserId,
+          },
+        });
+      }
+
+      return task;
+    });
+
+    await sendSms("+880 1601 076098", `Task ${title} has been assigned to you`);
+
+    res.status(201).json(result);
   } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: `Error creating a task: ${error.message}` });
+    console.error("Error creating a task:", error);
+    res.status(500).json({
+      message: `Error creating a task: ${error.message}`,
+    });
   }
 };
 
@@ -131,7 +167,6 @@ export const updateTask = async (
         points,
         projectId,
         authorUserId,
-        assignedUserId,
       },
     });
     res.status(200).json(task);
@@ -150,11 +185,13 @@ export const getUserTasks = async (
     const { userId } = req.params;
     const tasks = await prisma.task.findMany({
       where: {
-        OR: [{ authorUserId: userId }, { assignedUserId: userId }],
+        OR: [{ authorUserId: userId }],
       },
       include: {
         author: true,
-        assignee: true,
+        comments: true,
+        attachments: true,
+        taskAssignments: true,
       },
     });
     res.status(200).json(tasks);
