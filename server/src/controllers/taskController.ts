@@ -1,4 +1,4 @@
-import { sendSms } from "../services/notification/notificationService";
+import { sendWhatsApp } from "../services/notification/notificationService";
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
@@ -99,7 +99,10 @@ export const createTask = async (
       return task;
     });
 
-    await sendSms("+880 1601 076098", `Task ${title} has been assigned to you`);
+    await sendWhatsApp(
+      "8801601076098",
+      `Task ${title} has been assigned to you`
+    );
 
     res.status(201).json(result);
   } catch (error: any) {

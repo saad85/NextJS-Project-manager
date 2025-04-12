@@ -12,6 +12,8 @@ import employeeRoutes from "./routes/employeeRoutes";
 import authRoutes from "./routes/authRoutes";
 import { authenticateUser } from "./middlewares/authMiddleware";
 import orgUserRoutes from "./routes/orgUserRoutes";
+import { inboundService } from "./services/webhook/inboundService";
+import { handleInboundMessage } from "./middlewares/vonageMiddleware";
 
 dotenv.config();
 const app = express();
@@ -29,6 +31,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRoutes);
+
+app.use("/inbound", handleInboundMessage, inboundService);
 
 app.use(authenticateUser);
 
