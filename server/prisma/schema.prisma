@@ -35,6 +35,8 @@ model Project {
   projectTeams    ProjectTeam[]
   attachments     Attachment[]
   projectManagers ProjectManager[]
+  logs            Log[]
+  notificationLogs NotificationLog[]
   createdAt       DateTime         @default(now())
   createdBy       String?
 
@@ -98,6 +100,8 @@ model Task {
   taskAssignments TaskAssignment[]
   attachments     Attachment[]
   comments        Comment[]
+  logs            Log[]
+  notificationLogs   NotificationLog[]
   createdAt       DateTime        @default(now())
   createdBy       String?
 
@@ -182,6 +186,7 @@ model OrganizationUser {
   taskAssignments TaskAssignment[]
   taskAuthor      Task[]              @relation("TaskAuthor")
   comments        Comment[]
+  notifications   NotificationLog[]
   createdAt       DateTime            @default(now())
   createdBy       String?
 
@@ -217,6 +222,7 @@ model User {
   team              Team?              @relation(fields: [teamId], references: [id])
   profile           Profile?
   createdBy         String?
+  whatsAppNumber String?
 
   @@index([userId])
   @@index([email])
@@ -281,4 +287,85 @@ model OrganizationSettings {
   createdBy       String?
 
   @@index([orgId])
+}
+
+enum LogTypeEnum {
+ createLog
+ changeLog
+ deleteLog 
+}
+
+enum LogContextEnum {
+  task
+  project
+  organization
+  user
+}
+
+model Log {
+  id        String  @id @default(uuid())
+  type      LogTypeEnum
+  orgId  String
+  oldData   String?
+  newData   String?
+  oldId     String?
+  newId     String?
+  taskId    String?
+  context   LogContextEnum
+  projectId String
+  createdAt DateTime @default(now())
+  createdBy String?
+
+  task Task? @relation(fields: [taskId], references: [id])
+  project Project? @relation(fields: [projectId], references: [id])
+
+  @@index([type])
+  @@index([context])
+  @@index([projectId])
+  @@index([oldId])
+  @@index([newId])
+  @@index([taskId])
+}
+
+enum NotificationLogTypeEnum {
+  sms
+  email
+  message_channel
+}
+
+enum NotificationLogContextEnum {
+  task
+  project
+  organization
+  user
+}
+
+enum NotificationLogChannelEnum {
+  whatsApp
+}
+
+model NotificationLog {
+  id        String  @id @default(uuid())
+  type      NotificationLogTypeEnum
+  context   NotificationLogContextEnum
+  orgId  String
+  receiverId String
+  content   String
+  taskId    String?
+  projectId String?
+  createdAt DateTime @default(now())
+  createdBy String?
+  toEmail String?
+  toPhone String?
+  channel NotificationLogChannelEnum?
+
+  task Task? @relation(fields: [taskId], references: [id])
+  project Project? @relation(fields: [projectId], references: [id])
+  receiver OrganizationUser @relation(fields: [receiverId], references: [id])
+
+  @@index([type])
+  @@index([context])
+  @@index([projectId])
+  @@index([receiverId])
+  @@index([taskId])
 }

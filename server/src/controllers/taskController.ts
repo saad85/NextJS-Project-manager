@@ -1,5 +1,14 @@
+import {
+  createNotificationLog,
+  createNotificationLogs,
+} from "../services/notificationLog/notificationLogService";
 import { sendWhatsApp } from "../services/notification/notificationService";
-import { PrismaClient } from "@prisma/client";
+import {
+  NotificationLogChannelEnum,
+  NotificationLogContextEnum,
+  NotificationLogTypeEnum,
+  PrismaClient,
+} from "@prisma/client";
 import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
@@ -99,17 +108,72 @@ export const createTask = async (
       return task;
     });
 
-    await sendWhatsApp(
-      "8801601076098",
-      `Task ${title} has been assigned to you`
-    );
+    const notificationLogContent = `Task ${title} has been assigned to you`;
+
+    const assignedUsers = await prisma.taskAssignment.findMany({
+      where: {
+        taskId: result.id,
+        orgUser: {
+          user: {
+            NOT: {
+              whatsAppNumber: null,
+            },
+          },
+        },
+      },
+      include: {
+        orgUser: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    console.log("checking for assigned users --> ", assignedUsers);
+
+    const notificationLogData = [];
+
+    for (const assignedUser of assignedUsers) {
+      console.log("assignedUser --> ", assignedUser);
+      if (assignedUser.orgUser.user.whatsAppNumber) {
+        const phone =
+          assignedUser.orgUser.user.whatsAppNumber[0] === "+"
+            ? assignedUser.orgUser.user.whatsAppNumber.replace("+", "")
+            : assignedUser.orgUser.user.whatsAppNumber;
+
+        console.log("phone --> ", phone);
+
+        await sendWhatsApp(phone, notificationLogContent);
+
+        console.log("whats app message send --> ", notificationLogData);
+
+        notificationLogData.push({
+          type: NotificationLogTypeEnum.message_channel,
+          context: NotificationLogContextEnum.task,
+          projectId: projectId,
+          receiverId: assignedUser.orgUser.id,
+          taskId: result.id,
+          channel: NotificationLogChannelEnum.whatsApp,
+          content: notificationLogContent,
+          toEmail: null,
+          toPhone: phone,
+          orgId: req.user.orgId,
+        });
+      }
+    }
+
+    console.log("notificationLogData --> ", notificationLogData);
+
+    if (notificationLogData.length > 0) {
+      await createNotificationLogs(notificationLogData);
+    }
 
     res.status(201).json(result);
   } catch (error: any) {
-    console.error("Error creating a task:", error);
-    res.status(500).json({
-      message: `Error creating a task: ${error.message}`,
-    });
+    res
+      .status(500)
+      .json({ message: `Error creating a task: ${error.message}` });
   }
 };
 

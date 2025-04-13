@@ -8,8 +8,6 @@ export const handleInboundMessage = (
 ) => {
   const isValid = verifyVonageJWT(req.headers);
 
-  console.log("isValid", isValid);
-
   if (!isValid) {
     return res.status(401).json({ error: "Unauthorized: Invalid Signature" });
   }
