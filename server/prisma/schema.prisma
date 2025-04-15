@@ -94,6 +94,7 @@ model Task {
   points         Int?
   projectId      String
   authorUserId   String
+  orgId  String
 
   project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
   author         OrganizationUser            @relation("TaskAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
@@ -101,6 +102,7 @@ model Task {
   attachments     Attachment[]
   comments        Comment[]
   logs            Log[]
+  organization    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   notificationLogs   NotificationLog[]
   createdAt       DateTime        @default(now())
   createdBy       String?
@@ -271,6 +273,7 @@ model Organization {
   organizationUsers   OrganizationUser[]
   settings            OrganizationSettings?
   teams               Team[]
+  tasks               Task[]
   createdBy           String?
 
   @@index([subdomain])

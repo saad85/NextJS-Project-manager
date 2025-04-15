@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { TaskDetailsProps } from "./types";
 import { statusVariants, priorityVariants, formatDate } from "./utils";
+import { useGetTaskByIdQuery } from "@/state/api";
+import Loading from "../Loading";
 
 export function TaskDetails({
   id,
@@ -32,6 +34,8 @@ export function TaskDetails({
   attachments,
   taskAssignments,
 }: TaskDetailsProps) {
+  const { data: task, isLoading } = useGetTaskByIdQuery({ taskId: id });
+  if (isLoading) return <Loading />;
   return (
     <TooltipProvider>
       <Card className="w-full lg:w-[100%]">

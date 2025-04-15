@@ -83,6 +83,7 @@ export const createTask = async (
           points,
           projectId,
           authorUserId,
+          orgId: req.user.orgId,
         },
       });
 
@@ -266,5 +267,31 @@ export const getUserTasks = async (
     res
       .status(500)
       .json({ message: `Error getting user tasks: ${error.message}` });
+  }
+};
+
+export const getTaskById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { taskId } = req.params;
+    const task = await prisma.task.findUnique({
+      where: {
+        id: taskId,
+        orgId: req.user.orgId,
+      },
+      include: {
+        author: true,
+        comments: true,
+        attachments: true,
+        taskAssignments: true,
+      },
+    });
+    res.status(200).json(task);
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: `Error getting task by id: ${error.message}` });
   }
 };

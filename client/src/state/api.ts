@@ -287,6 +287,9 @@ export const api = createApi({
       }),
       invalidatesTags: ["OrgUsers"],
     }),
+    getTaskById: build.query<Task, { taskId: string }>({
+      query: ({ taskId }) => `tasks/${taskId}`,
+    }),
   }),
 });
 
@@ -308,4 +311,5 @@ export const {
   useGetOrgUsersQuery,
   useCreateOrgUserMutation,
   useLazyGetOrgUsersQuery,
+  useGetTaskByIdQuery,
 } = api;
