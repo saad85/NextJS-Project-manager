@@ -1,6 +1,11 @@
 import { User } from "@/state/api";
 
-export type Status = "backlog" | "todo" | "in_progress" | "done" | "canceled";
+export type Status =
+  | "Backlog"
+  | "ToDo"
+  | "WorkInProgress"
+  | "Done"
+  | "Canceled";
 export type Priority = "low" | "medium" | "high" | "urgent";
 
 export interface Attachment {

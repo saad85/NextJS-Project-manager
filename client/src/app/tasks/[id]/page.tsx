@@ -18,7 +18,7 @@ function getTaskDetails(id: string): TaskDetailsProps {
     title: "Implement user authentication",
     description:
       "Create a secure authentication system with JWT tokens and refresh tokens.",
-    status: "in_progress",
+    status: "WorkInProgress",
     priority: "high",
     tags: ["backend", "security"],
     startDate: "2023-10-01",
