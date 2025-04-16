@@ -7,6 +7,7 @@ import {
   getUserTasks,
   getTaskById,
 } from "../controllers/taskController";
+import { createTaskChecklist } from "@/controllers/taskCheckListController";
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.patch("/:taskId/status", updateTaskStatus);
 router.get("/user/:userId", getUserTasks);
 router.patch("/:taskId", updateTask);
 router.get("/:taskId", getTaskById);
+router.post("/:taskId/checklist", createTaskChecklist);
 
 export default router;
