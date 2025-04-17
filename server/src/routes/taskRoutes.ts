@@ -7,7 +7,7 @@ import {
   getUserTasks,
   getTaskById,
 } from "../controllers/taskController";
-import { createTaskChecklist } from "@/controllers/taskCheckListController";
+import { createTaskChecklist } from "../controllers/taskCheckListController";
 
 const router = Router();
 

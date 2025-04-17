@@ -10,18 +10,20 @@ export const createTaskChecklist = async (
   try {
     const { taskId } = req.params;
     const { title } = req.body;
-    // const task = await prisma.taskChecklist.create({
-    //   data: {
-    //     title,
-    //     task: {
-    //       connect: { id: taskId },
-    //     },
-    //     completed: false,
-    //     createdAt: new Date(),
-    //     createdBy: req.user.id,
-    //   },
-    // });
-    // res.status(201).json(task);
+    const task = await prisma.taskChecklist.create({
+      data: {
+        title,
+        orgId: req.user.orgId,
+        task: {
+          connect: { id: taskId },
+        },
+        completed: false,
+        createdAt: new Date(),
+        createdBy: req.user.id,
+      },
+    });
+    console.log("checking for created task check List ", task);
+    res.status(201).json(task);
   } catch (error: any) {
     res
       .status(500)
