@@ -6,7 +6,14 @@ export type Status =
   | "WorkInProgress"
   | "Done"
   | "Canceled";
-export type Priority = "low" | "medium" | "high" | "urgent";
+export type Priority = "Low" | "Medium" | "High" | "Urgent" | "Backlog";
+
+import {
+  Status as StatusEnum,
+  Priority as PriorityEnum,
+  Attachment as AttachmentEnum,
+  TaskAssignment as TaskAssignmentEnum,
+} from "@/state/api";
 
 export interface Attachment {
   id: string;
@@ -27,14 +34,14 @@ export interface TaskDetailsProps {
   id: string;
   title: string;
   description?: string;
-  status?: Status;
-  priority?: Priority;
-  tags?: string[];
+  status?: StatusEnum;
+  priority?: PriorityEnum;
+  tags?: string;
   startDate?: string;
   dueDate?: string;
   points?: number;
-  attachments?: Attachment[];
-  taskAssignments?: TaskAssignment[];
+  attachments?: AttachmentEnum[];
+  taskAssignments?: TaskAssignmentEnum[];
 }
 
 export interface Comment {

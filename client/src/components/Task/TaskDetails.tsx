@@ -56,20 +56,21 @@ export function TaskDetails({
                       <Avatar className="h-8 w-8">
                         <AvatarImage
                           src={
-                            assignment.orgUser.user.profilePictureUrl ||
+                            assignment?.orgUser?.user?.profilePictureUrl ||
                             undefined
                           }
                         />
                         <AvatarFallback>
-                          {assignment.orgUser.user.firstName?.charAt(0) || "U"}
+                          {assignment?.orgUser?.user?.firstName?.charAt(0) ||
+                            "U"}
                         </AvatarFallback>
                       </Avatar>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>
-                      {assignment.orgUser.user.firstName}{" "}
-                      {assignment.orgUser.user.lastName}
+                      {assignment?.orgUser?.user?.firstName}{" "}
+                      {assignment?.orgUser?.user?.lastName}
                     </p>
                   </TooltipContent>
                 </Tooltip>

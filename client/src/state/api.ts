@@ -289,6 +289,7 @@ export const api = createApi({
     }),
     getTaskById: build.query<Task, { taskId: string }>({
       query: ({ taskId }) => `tasks/${taskId}`,
+      providesTags: ["Tasks"],
     }),
   }),
 });
