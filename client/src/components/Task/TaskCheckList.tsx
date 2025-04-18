@@ -4,29 +4,49 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ChecklistItem } from "./types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  useCreateTaskChecklistMutation,
+  useLazyGetTaskCheckListsQuery,
+} from "@/state/api";
+import Loading from "../Loading";
 
 interface TaskChecklistProps {
   items: ChecklistItem[];
-  onAddItem: (title: string) => void;
   onToggleItem: (id: string, completed: boolean) => void;
+  taskId: string;
 }
 
 export function TaskChecklist({
   items,
-  onAddItem,
   onToggleItem,
+  taskId,
 }: TaskChecklistProps) {
   const [newItemTitle, setNewItemTitle] = useState("");
   const [isAdding, setIsAdding] = useState(false);
+  const [createTaskChecklistMutation] = useCreateTaskChecklistMutation();
+  const [
+    getTaskCheckLists,
+    { data: taskChecklists, isLoading: isTaskChecklistsLoading },
+  ] = useLazyGetTaskCheckListsQuery();
+
+  useEffect(() => {
+    getTaskCheckLists({ taskId });
+  }, []);
 
   const handleAddItem = () => {
     if (newItemTitle.trim()) {
-      onAddItem(newItemTitle);
+      createTaskChecklistMutation({
+        title: newItemTitle,
+        taskId: taskId,
+        completed: false,
+      });
       setNewItemTitle("");
       setIsAdding(false);
     }
   };
+
+  if (isTaskChecklistsLoading) return <Loading />;
 
   return (
     <Card className="w-full lg:w-[100%]">
@@ -34,7 +54,7 @@ export function TaskChecklist({
         <CardTitle>Checklist</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        {items.map((item) => (
+        {taskChecklists?.map((item) => (
           <div key={item.id} className="flex items-center space-x-2">
             <Checkbox
               id={`checklist-${item.id}`}

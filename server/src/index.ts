@@ -14,6 +14,7 @@ import { authenticateUser } from "./middlewares/authMiddleware";
 import orgUserRoutes from "./routes/orgUserRoutes";
 import { inboundService } from "./services/webhook/inboundService";
 import { handleInboundMessage } from "./middlewares/vonageMiddleware";
+import taskCheckListRoutes from "./routes/taskCheckListRoutes";
 
 dotenv.config();
 const app = express();
@@ -42,6 +43,7 @@ app.use("/users", userRoutes);
 app.use("/teams", teamRoutes);
 app.use("/employees", employeeRoutes);
 app.use("/organization-users", orgUserRoutes);
+app.use("/task-checklist", taskCheckListRoutes);
 
 const port = Number(process.env.PORT) || 3000;
 app.listen(port, "0.0.0.0", () => {

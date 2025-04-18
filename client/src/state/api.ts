@@ -143,6 +143,15 @@ export interface OrgUserInput {
   hireDate?: string;
 }
 
+export interface TaskChecklist {
+  id: string;
+  title: string;
+  completed: boolean;
+  createdAt: Date;
+  createdBy: number;
+  taskId: string;
+}
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL,
@@ -155,7 +164,15 @@ export const api = createApi({
     },
   }),
   reducerPath: "api",
-  tagTypes: ["Employees", "Projects", "Tasks", "Users", "Teams", "OrgUsers"],
+  tagTypes: [
+    "Employees",
+    "Projects",
+    "Tasks",
+    "Users",
+    "Teams",
+    "OrgUsers",
+    "TaskChecklist",
+  ],
   endpoints: (build) => ({
     getProjects: build.query<Project[], void>({
       query: () => "projects",
@@ -291,6 +308,18 @@ export const api = createApi({
       query: ({ taskId }) => `tasks/${taskId}`,
       providesTags: ["Tasks"],
     }),
+    getTaskCheckLists: build.query<TaskChecklist[], { taskId: string }>({
+      query: ({ taskId }) => `task-checklist/${taskId}`,
+      providesTags: ["TaskChecklist"],
+    }),
+    createTaskChecklist: build.mutation<TaskChecklist, Partial<TaskChecklist>>({
+      query: (taskChecklist) => ({
+        url: "task-checklist",
+        method: "POST",
+        body: taskChecklist,
+      }),
+      invalidatesTags: ["Tasks", "TaskChecklist"],
+    }),
   }),
 });
 
@@ -313,4 +342,6 @@ export const {
   useCreateOrgUserMutation,
   useLazyGetOrgUsersQuery,
   useGetTaskByIdQuery,
+  useCreateTaskChecklistMutation,
+  useLazyGetTaskCheckListsQuery,
 } = api;

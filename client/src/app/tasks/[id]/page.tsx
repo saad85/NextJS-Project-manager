@@ -158,8 +158,8 @@ export default function TaskDetailsPage({
         <div className="w-full lg:w-[40%] space-y-6 pl-0 lg:pl-6">
           <TaskChecklist
             items={checklistItems}
-            onAddItem={handleAddChecklistItem}
             onToggleItem={handleToggleChecklistItem}
+            taskId={params.id}
           />
           <TaskAIFeatures />
         </div>

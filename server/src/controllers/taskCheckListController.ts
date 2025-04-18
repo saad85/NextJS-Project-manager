@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { hash } from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -9,8 +8,8 @@ export const createTaskChecklist = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { taskId } = req.params;
-    const { title } = req.body;
+    const { title, taskId } = req.body;
+    console.log("checking for created task check List ", title, taskId);
     const task = await prisma.taskChecklist.create({
       data: {
         title,

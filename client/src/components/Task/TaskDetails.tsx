@@ -21,19 +21,7 @@ import { statusVariants, priorityVariants, formatDate } from "./utils";
 import { useGetTaskByIdQuery } from "@/state/api";
 import Loading from "../Loading";
 
-export function TaskDetails({
-  id,
-  title,
-  description,
-  status,
-  priority,
-  tags,
-  startDate,
-  dueDate,
-  points,
-  attachments,
-  taskAssignments,
-}: TaskDetailsProps) {
+export function TaskDetails({ id }: TaskDetailsProps) {
   const { data: task, isLoading } = useGetTaskByIdQuery({ taskId: id });
   if (isLoading) return <Loading />;
   return (
@@ -92,8 +80,10 @@ export function TaskDetails({
 
             <div className="flex items-center gap-3">
               <Flag className="h-4 w-4 flex-shrink-0" />
-              {priority ? (
-                <Badge className={priorityVariants[priority]}>{priority}</Badge>
+              {task?.priority ? (
+                <Badge className={priorityVariants[task.priority]}>
+                  {task.priority}
+                </Badge>
               ) : (
                 <span className="text-sm text-muted-foreground">Not set</span>
               )}
