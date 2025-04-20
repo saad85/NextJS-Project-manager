@@ -320,6 +320,14 @@ export const api = createApi({
       }),
       invalidatesTags: ["Tasks", "TaskChecklist"],
     }),
+    updateTaskChecklist: build.mutation<TaskChecklist, Partial<TaskChecklist>>({
+      query: (taskChecklist) => ({
+        url: `task-checklist/${taskChecklist.id}`,
+        method: "PUT",
+        body: taskChecklist,
+      }),
+      invalidatesTags: ["Tasks", "TaskChecklist"],
+    }),
   }),
 });
 
@@ -344,4 +352,5 @@ export const {
   useGetTaskByIdQuery,
   useCreateTaskChecklistMutation,
   useLazyGetTaskCheckListsQuery,
+  useUpdateTaskChecklistMutation,
 } = api;

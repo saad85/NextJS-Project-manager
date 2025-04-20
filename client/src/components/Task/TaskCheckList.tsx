@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import {
   useCreateTaskChecklistMutation,
   useLazyGetTaskCheckListsQuery,
+  useUpdateTaskChecklistMutation,
 } from "@/state/api";
 import Loading from "../Loading";
 
@@ -17,11 +18,7 @@ interface TaskChecklistProps {
   taskId: string;
 }
 
-export function TaskChecklist({
-  items,
-  onToggleItem,
-  taskId,
-}: TaskChecklistProps) {
+export function TaskChecklist({ taskId }: TaskChecklistProps) {
   const [newItemTitle, setNewItemTitle] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [createTaskChecklistMutation] = useCreateTaskChecklistMutation();
@@ -46,6 +43,15 @@ export function TaskChecklist({
     }
   };
 
+  const [updateTaskChecklistMutation] = useUpdateTaskChecklistMutation();
+  const handleToggleItem = (id: string, completed: boolean) => {
+    console.log("id", id, completed);
+    updateTaskChecklistMutation({
+      id,
+      completed,
+    });
+  };
+
   if (isTaskChecklistsLoading) return <Loading />;
 
   return (
@@ -60,7 +66,7 @@ export function TaskChecklist({
               id={`checklist-${item.id}`}
               checked={item.completed}
               onCheckedChange={(checked) =>
-                onToggleItem(item.id, checked as boolean)
+                handleToggleItem(item.id, checked as boolean)
               }
             />
             <label

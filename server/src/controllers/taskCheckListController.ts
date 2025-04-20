@@ -42,7 +42,8 @@ export const updateTaskChecklist = async (
 ): Promise<void> => {
   try {
     const { checklistId } = req.params;
-    const { body } = req.body;
+    const { body } = req;
+    console.log("checklistId", checklistId);
 
     const task = await prisma.taskChecklist.findUnique({
       where: {
@@ -51,6 +52,8 @@ export const updateTaskChecklist = async (
       },
     });
 
+    console.log("task ", task);
+
     if (!task) throw new Error("Task not found");
 
     const updateData: TaskChecklistUpdateInput = {};
@@ -58,6 +61,8 @@ export const updateTaskChecklist = async (
     if (body.title && body.title !== task.title) updateData.title = body.title;
     if (body.hasOwnProperty("completed") && body.completed !== task.completed)
       updateData.completed = body.completed;
+
+    console.log("updateData", updateData);
 
     if (updateData) {
       const updatedTask = await prisma.taskChecklist.update({
@@ -70,6 +75,7 @@ export const updateTaskChecklist = async (
       res.status(200).json(updatedTask);
     }
   } catch (error: any) {
+    console.log(error, "error");
     res
       .status(500)
       .json({ message: `Error updating a task checklist: ${error.message}` });
